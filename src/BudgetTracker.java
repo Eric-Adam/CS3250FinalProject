@@ -1,6 +1,6 @@
-
+// Kinda want to gather everything here and have main call this.
 public class BudgetTracker {
-	// Kinda want to gather everything here and have main call this.
+	
 	
 
 	public void showBudget() {
