@@ -17,10 +17,11 @@ public class Main extends Application{
 	public void start(Stage primaryStage) throws Exception {
 		String stylesheet = getClass().getResource("styles/style.css").toExternalForm();
 		
-		Scene scene = new Scene(new RunGUI(), 500, 700);
+		Scene scene = new Scene(new RunGUI(), 1000, 700);
 		scene.getStylesheets().add(stylesheet);
 		
 		primaryStage.setScene(scene);
+		primaryStage.setTitle("Adam's Budget Tracker");
 		primaryStage.show();
 	}
 }
