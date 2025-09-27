@@ -1,8 +1,9 @@
+package myGUI;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 
 public class ChartPane extends StackPane{
-	// TODO: Create charts; need database stuff
+	// TODO: replace with charts; need database stuff
 	public ChartPane() {
 	for (int i=0; i<5; i++) {
 		Label label = new Label(Integer.toString(i));

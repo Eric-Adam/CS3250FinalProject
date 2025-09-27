@@ -1,3 +1,4 @@
+package myGUI;
 import javafx.geometry.Pos;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -19,7 +20,7 @@ public class TitlePane extends AnchorPane{
 		setRightAnchor(budgetLabel, 200.0);
 		this.getChildren().add(budgetLabel);
 		// TODO: add selected budget
-		String[] budgetList = {"Overall", "Wife", "Household", "Game"};
+		String[] budgetList = {"Overall", "Wife", "Household", "Game"};//TODO: make dynamic with actual budgets
 		ComboBox<String> budgetComboBox = new ComboBox<>();
 		budgetComboBox.getItems().addAll(budgetList);
 		budgetComboBox.setPromptText("Overall");

@@ -1,8 +1,9 @@
+package myGUI;
 import javafx.scene.layout.*;
 
 public class RunGUI extends BorderPane{
 	public RunGUI(){
-		// Top: Title, Quick values?
+		// Top: Title, Status, Selected Budget
 		TitlePane titlePane = new TitlePane();
 		this.setTop(titlePane);
 		

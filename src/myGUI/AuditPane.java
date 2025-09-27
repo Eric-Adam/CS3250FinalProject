@@ -1,8 +1,9 @@
+package myGUI;
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
 
 public class AuditPane extends VBox{
-	AuditPane(){
+	public AuditPane(){
 		super(10);
 		
 		// TODO: replace for loop with auditing functionality for Justifications; need database
