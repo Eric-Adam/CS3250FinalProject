@@ -11,10 +11,6 @@ public class RunGUI extends BorderPane{
 		InputPane inputPane = new InputPane();
 		this.setLeft(inputPane);
 		
-		// Right: Justification Auditing
-		AuditPane auditPane = new AuditPane();
-		this.setRight(auditPane);
-		
         // Center: Budget Charts
 		ChartPane chartPane = new ChartPane();
 		this.setCenter(chartPane);        

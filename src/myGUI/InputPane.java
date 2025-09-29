@@ -10,6 +10,7 @@ public class InputPane extends VBox{
 		// Basic control buttons
 		Label budgetLabel =  new Label("Budget:");
 		this.getChildren().add(budgetLabel);
+		
 		Button addNewBudgetButton = new Button("Add New");
 		Button editBudgetButton = new Button("Edit");
 		Button deleteBudgetButton = new Button("Delete");
@@ -20,20 +21,24 @@ public class InputPane extends VBox{
 		
 		// Add new budget buttons
 		Label newBudgetLabel = new Label("New budget:  ");
-		TextField newBudgetText = new TextField("New Budget Name");
+		
+		TextField newBudgetText = new TextField("");
 		HBox newBudgetTextEntry = new HBox();
 		newBudgetTextEntry.getChildren().addAll(newBudgetLabel,newBudgetText);
 		this.getChildren().add(newBudgetTextEntry);
+		
 		Label newBudgetAmountLabel = new Label("Amount:      $");
 		TextField newBudgetAmountText = new TextField("0.00");
 		HBox newBudgetAmountEntry = new HBox();
 		newBudgetAmountEntry.getChildren().addAll(newBudgetAmountLabel,newBudgetAmountText);
 		this.getChildren().add(newBudgetAmountEntry);
+		
 		Button submitBudgetButton = new Button("Submit Budget");
 		Button cancelNewBudgetButton = new Button("Cancel");
 		HBox submitCancelBudget = new HBox(5);
 		submitCancelBudget.getChildren().addAll(submitBudgetButton,cancelNewBudgetButton);
 		this.getChildren().add(submitCancelBudget);
+		
 		makeInvisible(newBudgetTextEntry,newBudgetAmountEntry,submitCancelBudget,
 				newBudgetTextEntry,newBudgetAmountEntry,submitCancelBudget);
 		
@@ -46,6 +51,7 @@ public class InputPane extends VBox{
 		// Basic transaction control buttons
 		Label transactionLabel =  new Label("Transaction:");
 		this.getChildren().add(transactionLabel);
+		
 		Button addNewTransactionButton = new Button("Add New");
 		Button editTransactionButton = new Button("Edit");
 		Button deleteTransactionButton = new Button("Delete");
@@ -63,6 +69,7 @@ public class InputPane extends VBox{
 		HBox newTransactionBudgetEntry = new HBox();
 		newTransactionBudgetEntry.getChildren().addAll(newTransactionLabel,transactionBudget);
 		this.getChildren().add(newTransactionBudgetEntry);
+		
 		Label newTransactionTypeLabel = new Label("Transaction Type:  ");
 		String[] transactionTypes = {"Income", "Expense"};
 		ComboBox<String> transactionType = new ComboBox<>();
@@ -71,16 +78,19 @@ public class InputPane extends VBox{
 		HBox newTransactionTypeEntry = new HBox();
 		newTransactionTypeEntry.getChildren().addAll(newTransactionTypeLabel,transactionType);
 		this.getChildren().add(newTransactionTypeEntry);
+		
 		Label newTransactionAmountLabel = new Label("Amount:      $");
 		TextField newTransactionAmountText = new TextField("0.00");
 		HBox newTransactionAmountEntry = new HBox();
 		newTransactionAmountEntry.getChildren().addAll(newTransactionAmountLabel,newTransactionAmountText);
 		this.getChildren().add(newTransactionAmountEntry);
+		
 		Button submitTransactionButton = new Button("Submit Transaction");
 		Button cancelNewTransactionButton = new Button("Cancel");
 		HBox submitCancelTransaction = new HBox(5);
 		submitCancelTransaction.getChildren().addAll(submitTransactionButton,cancelNewTransactionButton);
 		this.getChildren().add(submitCancelTransaction);
+		
 		makeInvisible(newTransactionBudgetEntry,newTransactionAmountEntry,submitCancelTransaction,
 				newTransactionBudgetEntry,newTransactionAmountEntry,submitCancelTransaction,
 				newTransactionTypeEntry,newTransactionTypeEntry);

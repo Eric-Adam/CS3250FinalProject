@@ -1,12 +1,15 @@
 package myGUI;
 import javafx.geometry.Pos;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.layout.*;
+import budgetTracker.Budget;
 
 public class TitlePane extends AnchorPane{
 	public TitlePane() {
-		// TODO: Center title
+		Budget tempBudget = new Budget(25.0); // TODO: replace with dynamic budget
+		Double tempRemainingBudget = 2.25; // TODO: replace with dynamic remaining value
+		
+		// Main Title
 		Label titleLabel = new Label("------ Budget Tracker ------");
 		HBox  titlePane = new HBox (titleLabel);
 		titlePane.setAlignment(Pos.CENTER);
@@ -15,25 +18,20 @@ public class TitlePane extends AnchorPane{
 		this.getChildren().add(titlePane);
 		
 		
-		Label budgetLabel = new Label("Budget");
+		// Shows remaining budget
+		Label budgetLabel = new Label("Remaining Balance:  $" + Double.toString(tempRemainingBudget));
 		setTopAnchor(budgetLabel, 100.0);
 		setRightAnchor(budgetLabel, 200.0);
 		this.getChildren().add(budgetLabel);
-		// TODO: add selected budget
-		String[] budgetList = {"Overall", "Wife", "Household", "Game"};//TODO: make dynamic with actual budgets
-		ComboBox<String> budgetComboBox = new ComboBox<>();
-		budgetComboBox.getItems().addAll(budgetList);
-		budgetComboBox.setPromptText("Overall");
-		setTopAnchor(budgetComboBox, 100.0);
-		setRightAnchor(budgetComboBox, 50.0);
-		this.getChildren().add(budgetComboBox);
-
 		
+
+		// Shows status of the budget
 		Label statusLabel = new Label("Status:");
 		setTopAnchor(statusLabel, 100.0);
 		setLeftAnchor(statusLabel, 250.0);
 		this.getChildren().add(statusLabel);
-		// TODO: replace with dynamic budget status (i.e. UNDER BUDGET, TIGHT, AT RISK, OVER BUDGET)
+		// TODO: Make dynamic
+		//Label statusValLabel = new Label(budget.getBudgetStatus());
 		Label statusValLabel = new Label("TIGHT");
 		setTopAnchor(statusValLabel, 100.0);
 		setLeftAnchor(statusValLabel, 300.0);
