@@ -25,4 +25,6 @@ public class Main extends Application{
 		primaryStage.setTitle("Adam's Budget Tracker");
 		primaryStage.show();
 	}
+		
+
 }

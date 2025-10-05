@@ -1,0 +1,7 @@
+transactionAmount,category,note,incomeExpense,date
+10.98,Grocery,"ketchup, hotdog, buns",false,2025-10-01
+9.99,Delivery,"Doordash subscription",false,2025-09-30
+17.11,School,"Chegg subscription",false,2025-09-29
+101.00,Bill,"T-Moblie",false,2025-09-22
+110.00,Transfer,"Transfer from Erika",true,2025-09-22
+2997.58,Loan,"School loan",true,2025-08-20

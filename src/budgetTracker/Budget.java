@@ -4,8 +4,8 @@ import javax.swing.JOptionPane;
 
 public class Budget {
 	private double budgetMax;
-	private ArrayList<Income> income;
-	private ArrayList<Expense> expenses;	
+	private ArrayList<Transaction> income;
+	private ArrayList<Transaction> expenses;	
 	
 	public Budget(double budgetMax) {
 		this.budgetMax = budgetMax;
@@ -20,51 +20,51 @@ public class Budget {
 	}
 	
 	// Adds tracked transactions
-	public void addIncome(Income income) {
+	public void addIncome(Transaction income) {
         this.income.add(income);
         JOptionPane.showMessageDialog(null, 
         		"$"+income.getTransactionAmount()+" added to income");
     }
-    public void addExpense(Expense expense) {
+    public void addExpense(Transaction expense) {
         this.expenses.add(expense);
         JOptionPane.showMessageDialog(null, 
         		"Expense of $"+expense.getTransactionAmount()+" added.");
     }
     
     // Removes tracked transactions
-	public void removeIncome(Income income) {
+	public void removeIncome(Transaction income) {
         this.income.remove(income);
         JOptionPane.showMessageDialog(null, 
         		"$"+income.getTransactionAmount()+" removed from income");
     }
-    public void removeExpense(Expense expense) {
+    public void removeExpense(Transaction expense) {
         this.expenses.remove(expense);
         JOptionPane.showMessageDialog(null, 
         		"Expense of $"+expense.getTransactionAmount()+" removed.");
     }
 
-    public double getOverallBalance(ArrayList<Income> incomeArray, ArrayList<Expense> expenseArray) {
+    public double getOverallBalance(ArrayList<Transaction> incomeArray, ArrayList<Transaction> expenseArray) {
     	double runningIncome = 0;
     	double runningExpense = 0;
     	
-    	for (Income income: incomeArray) {
+    	for (Transaction income: incomeArray) {
     		runningIncome += income.getTransactionAmount();
     	}
-    	for (Expense expense: expenseArray) {
+    	for (Transaction expense: expenseArray) {
     		runningExpense += expense.getTransactionAmount();
     	}
         return runningIncome - runningExpense;
     }
     
-    public double getCategoryBalance(ArrayList<Income> incomeArray, ArrayList<Expense> expenseArray, String category) {
+    public double getCategoryBalance(ArrayList<Transaction> incomeArray, ArrayList<Transaction> expenseArray, String category) {
     	double runningIncome = 0;
     	double runningExpense = 0;
     	
-    	for (Income income: incomeArray) {
+    	for (Transaction income: incomeArray) {
     		if (category.equals(income.getCategory())) 
     			runningIncome += income.getTransactionAmount();
     	}
-    	for (Expense expense: expenseArray) {
+    	for (Transaction expense: expenseArray) {
     		if (category.equals(expense.getCategory())) 
     			runningExpense += expense.getTransactionAmount();
     	}

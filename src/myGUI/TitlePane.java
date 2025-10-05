@@ -2,11 +2,9 @@ package myGUI;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.layout.*;
-import budgetTracker.Budget;
 
 public class TitlePane extends AnchorPane{
 	public TitlePane() {
-		Budget tempBudget = new Budget(25.0); // TODO: replace with dynamic budget
 		Double tempRemainingBudget = 2.25; // TODO: replace with dynamic remaining value
 		
 		// Main Title
