@@ -24,10 +24,10 @@ public class InputPane extends VBox{
 		// Add new transaction buttons/fields
 		// --- Category field
 		Label newTransactionLabel = new Label("Category:          ");
-		String[] existingCategories = {"Household", "Wife", "Games"};//TODO: make dynamic with actual budgets
+		String[] existingCategories = {"Household", "Wife", "Games"};//TODO: make dynamic or create a dozen possibilities
 		ComboBox<String> transactionCategory = new ComboBox<>();
+		transactionCategory.setValue(existingCategories[0]);
 		transactionCategory.getItems().addAll(existingCategories);
-		transactionCategory.setPromptText("Category");
 		HBox newTransactionBudgetEntry = new HBox();
 		newTransactionBudgetEntry.getChildren().addAll(newTransactionLabel,transactionCategory);
 		this.getChildren().add(newTransactionBudgetEntry);
@@ -44,7 +44,7 @@ public class InputPane extends VBox{
 		String[] transactionTypes = {"Income", "Expense"};
 		ComboBox<String> transactionType = new ComboBox<>();
 		transactionType.getItems().addAll(transactionTypes);
-		transactionType.setPromptText("Income");
+		transactionType.setValue(transactionTypes[0]);
 		HBox newTransactionTypeEntry = new HBox();
 		newTransactionTypeEntry.getChildren().addAll(newTransactionTypeLabel,transactionType);
 		this.getChildren().add(newTransactionTypeEntry);
@@ -59,6 +59,7 @@ public class InputPane extends VBox{
 		// --- Date field
 		Label newTransactionDateLabel = new Label("Date: ");
 		DatePicker newTransactionDateEntry = new DatePicker();
+		newTransactionDateEntry.setValue(LocalDate.now());
 		HBox newTransactionDate = new HBox();
 		newTransactionDate.getChildren().addAll(newTransactionDateLabel,newTransactionDateEntry);
 		this.getChildren().add(newTransactionDate);
@@ -83,30 +84,16 @@ public class InputPane extends VBox{
 		Label chartLabel = new Label("Charts and Graphs:");
 		this.getChildren().add(chartLabel);
 		
-		ToggleButton saveChartToggle = new ToggleButton("Save");
+		Button saveChartButton = new Button("Save");
 		String[] chartTypes = {"30-Day Transactions", "Category", "In v Out"};
 		ComboBox<String> chartTypeComboBox = new ComboBox<>();
 		chartTypeComboBox.getItems().addAll(chartTypes);
-		chartTypeComboBox.setPromptText("Default");
+		chartTypeComboBox.setValue("30-Day Transactions");
 		HBox chartTypeHbox = new HBox(5);
-		chartTypeHbox.getChildren().addAll(chartTypeComboBox,saveChartToggle);
+		chartTypeHbox.getChildren().addAll(chartTypeComboBox,saveChartButton);
 		this.getChildren().add(chartTypeHbox);
 		
-		// Save Chart Buttons/Fields
-		Label fileNameLabel = new Label("Save chart as: ");
-		TextField fileNameTextField = new TextField("");
-		Label fileTypeLabel = new Label(".jpg");
-		HBox chartSaveAs = new HBox(5);
-		chartSaveAs.getChildren().addAll(fileNameLabel,fileNameTextField,fileTypeLabel);
-		this.getChildren().add(chartSaveAs);
 		
-		Button saveChartButton = new Button("Save Chart");
-		Button cancelSaveButton = new Button("Cancel");
-		HBox saveChart = new HBox();
-		saveChart.getChildren().addAll(saveChartButton, cancelSaveButton);
-		this.getChildren().add(saveChart);
-		
-		makeInvisible(chartSaveAs, saveChart);
 		
 		
 		// ----------------------------------- Listener Section -----------------------------------		
@@ -116,24 +103,24 @@ public class InputPane extends VBox{
 			if (addNewTransactionButton.isSelected()) {
 				makeVisible(newTransactionBudgetEntry,newTransactionAmountEntry,noteHbox,
 						newTransactionDate,submitCancelTransaction,newTransactionTypeEntry);
-				makeInvisible(chartSaveAs, saveChart);
-				saveChartToggle.setSelected(false);
             } else {
             	makeInvisible(newTransactionBudgetEntry,newTransactionAmountEntry,noteHbox,
             			newTransactionDate,submitCancelTransaction,newTransactionTypeEntry);
             }
         });
+		
 		// --- --- Transaction amount entry - forces entry to be valid
 		newTransactionAmountText.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.matches("\\d*(\\.\\d{0,2})?")) {
             	newTransactionAmountText.setText(oldValue);
             }
         });
-		// --- --- Submit Transaction - pull data from fields and creates a new transaction
+		
+		// --- --- Submit Transaction - pulls data from fields and creates a new transaction
 		submitTransactionButton.setOnAction(e->{
-			String file = "/resources/transactionDB.csv";
+			String file = "src/resources/transactionDB.csv";
 			double amountEntry = Double.parseDouble(newTransactionAmountText.getText());
-			String categoryEntry = transactionCategory.getPromptText();
+			String categoryEntry = transactionCategory.getValue();
 			String noteEntry = newNoteField.getText();
 			String typeEntry = transactionType.getValue();
 			LocalDate dateEntry = newTransactionDateEntry.getValue();
@@ -142,23 +129,25 @@ public class InputPane extends VBox{
 			if (typeEntry.equalsIgnoreCase("income")) 
 				inOut = true;
 			 else 
-				 inOut = false;
+					inOut = false;
 			
 			Transaction newTransaction = new Transaction(amountEntry, categoryEntry, noteEntry, inOut, dateEntry);
 			Transaction.saveToCSV(file, newTransaction);
 			
 			makeInvisible(newTransactionBudgetEntry,newTransactionAmountEntry,noteHbox,
 					newTransactionDate,submitCancelTransaction,newTransactionTypeEntry);
-			// TODO: Create new budget class/methods to call here
-			
-			
-			
-			
-			System.out.println(categoryEntry + " transaction added.");
+
 			addNewTransactionButton.setSelected(false);
 		});
-		// --- --- Cancel Transaction
+		
+		// --- --- Cancel Transaction - Resets defaults and closes new transaction
 		cancelNewTransactionButton.setOnAction(e -> {
+			transactionCategory.setValue(existingCategories[0]);
+			newNoteField.setText("");
+			transactionType.setValue(transactionTypes[0]);
+			newTransactionAmountText.setText("0.00");
+			newTransactionDateEntry.setValue(LocalDate.now());
+			
 			makeInvisible(newTransactionBudgetEntry,newTransactionAmountEntry,noteHbox,
 					newTransactionDate,submitCancelTransaction,newTransactionTypeEntry);
 			addNewTransactionButton.setSelected(false);
@@ -169,34 +158,23 @@ public class InputPane extends VBox{
 		
 		
 		// Chart Listeners		
-		// TODO: Select Chart listener	
-		// Save chart listener
-		saveChartToggle.setOnAction(e -> {
-			if (saveChartToggle.isSelected()) {
-				makeVisible(chartSaveAs, saveChart);
-				makeInvisible(newTransactionBudgetEntry,newTransactionAmountEntry,noteHbox,
-						newTransactionDate,submitCancelTransaction,newTransactionTypeEntry);
-				addNewTransactionButton.setSelected(false);
-
-            } else {
-				makeInvisible(chartSaveAs, saveChart);
-            }
-        });
-		cancelSaveButton.setOnAction(e -> {
-			makeInvisible(chartSaveAs, saveChart);
-			saveChartToggle.setSelected(false);
-        });
-		saveChartButton.setOnAction(e->{
-			String saveFileAs = fileNameTextField.getPromptText();
-			// TODO: Verify as valid file name, reject otherwise
-			saveFileAs = saveFileAs + ".jpg";
-			makeInvisible(chartSaveAs, saveChart);
-			// TODO: Call method to save chart 
-			System.out.println("Chart saved as " + saveFileAs);
-			saveChartToggle.setSelected(false);
-		});
-						
+		// --- Select Chart listener - changes which chart is displayed
+		// TODO: Select Chart listener; need charts
 		
+		// --- Save chart listener - Captures currently selected chart 
+		saveChartButton.setOnAction(e -> {
+			String[] fileNames = {"30DayLinear.jpg", "CategoryPie.jpg", "inVsOutBar.jpg"};
+			String chartFileName;
+			String chartNameCapture = chartTypeComboBox.getValue();
+			if(chartNameCapture.equalsIgnoreCase("30-Day Transactions"))
+				chartFileName = fileNames[0];
+			else if (chartNameCapture.equalsIgnoreCase("Category"))
+				chartFileName = fileNames[1];
+			else 
+				chartFileName = fileNames[2];
+			
+			// TODO: Create jpg from selected chart; need charts
+        });
 	}
 	
 	
@@ -209,10 +187,6 @@ public class InputPane extends VBox{
 		n5.setVisible(false); n5.setManaged(false);
 		n6.setVisible(false); n6.setManaged(false);
 	}
-	public void makeInvisible(Node n1,Node n2) {
-		n1.setVisible(false); n1.setManaged(false);
-		n2.setVisible(false); n2.setManaged(false);
-	}
 	public void makeVisible(Node n1,Node n2,Node n3,Node n4,Node n5,Node n6) {
 		n1.setVisible(true); n1.setManaged(true);
 		n2.setVisible(true); n2.setManaged(true);
@@ -221,11 +195,5 @@ public class InputPane extends VBox{
 		n5.setVisible(true); n5.setManaged(true);
 		n6.setVisible(true); n6.setManaged(true);
 	}
-	public void makeVisible(Node n1,Node n2) {
-		n1.setVisible(true); n1.setManaged(true);
-		n2.setVisible(true); n2.setManaged(true);
-	}
-	
-
 	
 }

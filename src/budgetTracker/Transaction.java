@@ -1,10 +1,9 @@
 package budgetTracker;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.time.format.DateTimeFormatter;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import javafx.scene.control.TableView;
 
 public class Transaction{
 	private int transactionID;			// unique for each transaction
@@ -65,7 +64,7 @@ public class Transaction{
 		this.date = date;
 	}
 	
-	// Save to CSV
+	// Appends to CSV
 	public static void saveToCSV(String fileName, Transaction trans) {
 		List<String> arr = new ArrayList<String>();
 		arr.add(Double.toString(trans.getTransactionAmount()));
@@ -74,8 +73,9 @@ public class Transaction{
 		arr.add(Boolean.toString(trans.isIncomeExpense()));
 		DateTimeFormatter  formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
 		arr.add(formatter.format(trans.getDate()));
-	
-		try (FileWriter writer = new FileWriter(fileName)) {
+		File file = new File(fileName);
+		
+		try (FileWriter writer = new FileWriter(file, true)) {
 			for (int i = 0; i < arr.size(); i++) {
 		        writer.append(arr.get(i));
 		        if (i < arr.size() - 1) {
@@ -88,8 +88,8 @@ public class Transaction{
 			System.out.println("Failed to write to file");
 		}
 	}
-		
-	// Escape double quotes
+    
+	// Escapes double quotes 
 	private static String escapeForCSV(String value) {
 	    if (value.contains(",") || value.contains("\"")) {
 	        value = value.replace("\"", "\"\""); 
