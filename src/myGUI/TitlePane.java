@@ -17,7 +17,8 @@ public class TitlePane extends AnchorPane{
 		
 		
 		// Shows remaining budget
-		Label budgetLabel = new Label("Remaining Balance:  $" + Double.toString(tempRemainingBudget));
+		//Label budgetLabel = new Label("Remaining Balance:  $" + Double.toString(tempRemainingBudget));
+		Label budgetLabel = new Label("Remaining Balance:  $ FIXME" );
 		setTopAnchor(budgetLabel, 100.0);
 		setRightAnchor(budgetLabel, 200.0);
 		this.getChildren().add(budgetLabel);
@@ -30,7 +31,7 @@ public class TitlePane extends AnchorPane{
 		this.getChildren().add(statusLabel);
 		// TODO: Make dynamic
 		//Label statusValLabel = new Label(budget.getBudgetStatus());
-		Label statusValLabel = new Label("TIGHT");
+		Label statusValLabel = new Label("FIXME");
 		setTopAnchor(statusValLabel, 100.0);
 		setLeftAnchor(statusValLabel, 300.0);
 		this.getChildren().add(statusValLabel);

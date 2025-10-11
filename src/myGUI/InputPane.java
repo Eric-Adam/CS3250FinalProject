@@ -23,10 +23,15 @@ public class InputPane extends VBox{
 		
 		// Add new transaction buttons/fields
 		// --- Category field
-		Label newTransactionLabel = new Label("Category:          ");
-		String[] existingCategories = {"Household", "Wife", "Games"};//TODO: make dynamic or create a dozen possibilities
+		Label newTransactionLabel = new Label("Category: ");
+		String[] existingCategories = {"Books","Car","Clothing","Credit Card","Entertainment",
+									   "Events","Gifts","Groceries","Household","Insurance",
+									   "Internet","Loan","Personal Care","Pets","Phone",
+									   "Rent","Retirement","Savings","School","Subscriptions",
+									   "Takeout/Delivery","Travel","Utilities","VA","Wife",
+									   "Miscellaneous"};
 		ComboBox<String> transactionCategory = new ComboBox<>();
-		transactionCategory.setValue(existingCategories[0]);
+		transactionCategory.setValue(existingCategories[25]);
 		transactionCategory.getItems().addAll(existingCategories);
 		HBox newTransactionBudgetEntry = new HBox();
 		newTransactionBudgetEntry.getChildren().addAll(newTransactionLabel,transactionCategory);
@@ -138,6 +143,11 @@ public class InputPane extends VBox{
 					newTransactionDate,submitCancelTransaction,newTransactionTypeEntry);
 
 			addNewTransactionButton.setSelected(false);
+			transactionCategory.setValue(existingCategories[25]);
+			newNoteField.setText("");
+			transactionType.setValue(transactionTypes[0]);
+			newTransactionAmountText.setText("0.00");
+			newTransactionDateEntry.setValue(LocalDate.now());
 		});
 		
 		// --- --- Cancel Transaction - Resets defaults and closes new transaction

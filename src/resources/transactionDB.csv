@@ -1,8 +1,23 @@
-transactionAmount,category,note,incomeExpense,date
-10.98,Grocery,hotdog stuff,false,2025-10-01
-9.99,Delivery,Doordash subscription,false,2025-09-30
-17.11,School,Chegg subscription,false,2025-09-29
-101.00,Bill,T-Moblie,false,2025-09-22
-110.00,Transfer,Transfer from Erika,true,2025-09-22
-2997.58,Loan,School loan,true,2025-08-20
+transactionAmount,category,note,income,date
+2520.0,VA,GI BIll,true,2025-10-11
+11.81,Subscriptions,Pandora,false,2025-10-09
+10.73,Subscriptions,ShopTitans,false,2025-10-09
+500.0,VA,GI Bill,true,2025-10-09
+1971.14,Wife,Transfer,false,2025-10-06
+10.98,Groceries,Hotdog stuff,false,2025-10-01
+9.99,Subscriptions,Doordash,false,2025-09-30
+17.11,Subscriptions,Chegg,false,2025-09-29
+101.0,Phone,Bill,false,2025-09-22
+38.0,Personal Care,Great Clips,false,2025-09-22
+10.73,Subscriptions,Webnovel,false,2025-09-22
+110.0,Wife,Transfer,true,2025-09-22
+167.68,Clothing,JCPenny,false,2025-09-17
+30.0,Miscellaneous,State Fair,false,2025-09-15
+46.96,Groceries,State Fair Food,false,2025-09-15
+20.37,Subscriptions,Hulu,false,2025-09-15
+8.45,Takeout/Delivery,Fiiz,false,2025-09-15
+11.81,Subscriptions,Pandora,false,2025-10-11
+143.64,VA,Pharmacy,false,2025-09-08
+79.99,Subscriptions,Crunchyroll-Yr,false,2025-09-04
+1743.0,Rent,A318,false,2025-09-02
 
