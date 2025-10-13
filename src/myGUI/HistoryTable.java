@@ -31,6 +31,7 @@ public class HistoryTable extends TableView<Transaction>{
 		    							LocalDate.parse(row[4])))
 		    .collect(Collectors.toList());
 		observableList.setAll(transactions);
+		
 		// Set up TableView		
 		// --- Tableview Columns
 		// --- --- Index column
@@ -119,8 +120,8 @@ public class HistoryTable extends TableView<Transaction>{
 		            setStyle("");
 		        } else {
 		            setStyle(item.isIncome()
-		                ? "-fx-background-color: rgb(200,255,200);"
-		                : "-fx-background-color: rgb(255,200,200);");
+		                ? "-fx-background-color: rgb(230,255,230);"
+		                : "-fx-background-color: rgb(255,230,230);");
 		        }
 		    }
 		});
@@ -129,23 +130,24 @@ public class HistoryTable extends TableView<Transaction>{
 		this.getColumns().addAll(indexColumn,categoryColumn,amountColumn, 
 									  noteColumn,dateColumn);
 		
-		// Wrap the list in a SortedList
+		// Sort the list by wrapping in a SortedList
 		SortedList<Transaction> sortedList = new SortedList<>(observableList);
 		sortedList.setComparator(Comparator.comparing(Transaction::getDate).reversed());
 		
-		// --- Set data set for tableview
+		// Set data for tableview
 		this.setItems(sortedList);
 		
 		// Auto-refresh every 5 seconds
 		Timeline refresher = new Timeline(
 		    new KeyFrame(Duration.seconds(5), e -> refreshTable())
 		);
-		refresher.setCycleCount(Animation.INDEFINITE); // Repeat forever
+		refresher.setCycleCount(Animation.INDEFINITE); 
 		refresher.play();
 	}
 
 
 	// Loads data from CSV file as unparsed strings 
+	// TODO: Can't handle commas in note, think of work around
 	private List<String[]> loadCSV() {
 		String filePath = "src/resources/transactionDB.csv"; 
         List<String[]> rows = new ArrayList<>();
@@ -163,7 +165,7 @@ public class HistoryTable extends TableView<Transaction>{
         return rows;	
 	}
 	
-	// Refreshes table contents when a transaction is added/deleted/edited
+	// Refreshes table contents for when a transaction is added/deleted/edited
 	public void refreshTable() {
 	    List<String[]> historyData = loadCSV();
 
@@ -178,7 +180,7 @@ public class HistoryTable extends TableView<Transaction>{
 	        ))
 	        .collect(Collectors.toList());
 
-	    observableList.setAll(transactions); // Just update the list, not the TableView
+	    observableList.setAll(transactions); 
 	}
 
 }

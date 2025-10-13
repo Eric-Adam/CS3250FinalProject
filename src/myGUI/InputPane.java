@@ -6,6 +6,15 @@ import javafx.scene.control.*;
 import javafx.scene.layout.*;
 
 public class InputPane extends VBox{
+	private static String[] categories = 
+		{"Books","Car","Clothing","Credit Card","Entertainment",
+		 "Events","Gifts","Groceries","Household","Insurance",
+		 "Internet","Loan","Personal Care","Pets","Phone",
+		 "Rent","Retirement","Savings","School","Subscriptions",
+		 "Takeout/Delivery","Travel","Utilities","VA","Wife",
+		 "Miscellaneous"};
+			
+	
 	public InputPane() {
 		super(20);
 		// -----------------------------------Transaction Section ---------------------------------
@@ -24,15 +33,9 @@ public class InputPane extends VBox{
 		// Add new transaction buttons/fields
 		// --- Category field
 		Label newTransactionLabel = new Label("Category: ");
-		String[] existingCategories = {"Books","Car","Clothing","Credit Card","Entertainment",
-									   "Events","Gifts","Groceries","Household","Insurance",
-									   "Internet","Loan","Personal Care","Pets","Phone",
-									   "Rent","Retirement","Savings","School","Subscriptions",
-									   "Takeout/Delivery","Travel","Utilities","VA","Wife",
-									   "Miscellaneous"};
 		ComboBox<String> transactionCategory = new ComboBox<>();
-		transactionCategory.setValue(existingCategories[25]);
-		transactionCategory.getItems().addAll(existingCategories);
+		transactionCategory.setValue(categories[25]);
+		transactionCategory.getItems().addAll(categories);
 		HBox newTransactionBudgetEntry = new HBox();
 		newTransactionBudgetEntry.getChildren().addAll(newTransactionLabel,transactionCategory);
 		this.getChildren().add(newTransactionBudgetEntry);
@@ -106,11 +109,19 @@ public class InputPane extends VBox{
 		// --- Add New Transaction - Displays buttons related to adding transactions
 		addNewTransactionButton.setOnAction(e -> {
 			if (addNewTransactionButton.isSelected()) {
+            	// Set to default
+    			transactionCategory.setValue(categories[25]);
+    			newNoteField.setText("");
+    			transactionType.setValue(transactionTypes[0]);
+    			newTransactionAmountText.setText("0.00");
+    			newTransactionDateEntry.setValue(LocalDate.now());
+    			
 				makeVisible(newTransactionBudgetEntry,newTransactionAmountEntry,noteHbox,
 						newTransactionDate,submitCancelTransaction,newTransactionTypeEntry);
+ 			
             } else {
             	makeInvisible(newTransactionBudgetEntry,newTransactionAmountEntry,noteHbox,
-            			newTransactionDate,submitCancelTransaction,newTransactionTypeEntry);
+						newTransactionDate,submitCancelTransaction,newTransactionTypeEntry);
             }
         });
 		
@@ -139,28 +150,17 @@ public class InputPane extends VBox{
 			Transaction newTransaction = new Transaction(amountEntry, categoryEntry, noteEntry, inOut, dateEntry);
 			Transaction.saveToCSV(file, newTransaction);
 			
+			addNewTransactionButton.setSelected(false);
 			makeInvisible(newTransactionBudgetEntry,newTransactionAmountEntry,noteHbox,
 					newTransactionDate,submitCancelTransaction,newTransactionTypeEntry);
-
-			addNewTransactionButton.setSelected(false);
-			transactionCategory.setValue(existingCategories[25]);
-			newNoteField.setText("");
-			transactionType.setValue(transactionTypes[0]);
-			newTransactionAmountText.setText("0.00");
-			newTransactionDateEntry.setValue(LocalDate.now());
 		});
 		
 		// --- --- Cancel Transaction - Resets defaults and closes new transaction
-		cancelNewTransactionButton.setOnAction(e -> {
-			transactionCategory.setValue(existingCategories[0]);
-			newNoteField.setText("");
-			transactionType.setValue(transactionTypes[0]);
-			newTransactionAmountText.setText("0.00");
-			newTransactionDateEntry.setValue(LocalDate.now());
-			
+		cancelNewTransactionButton.setOnAction(e -> {	
+			addNewTransactionButton.setSelected(false);
+
 			makeInvisible(newTransactionBudgetEntry,newTransactionAmountEntry,noteHbox,
 					newTransactionDate,submitCancelTransaction,newTransactionTypeEntry);
-			addNewTransactionButton.setSelected(false);
         });		
 		
 		// --- TODO: Edit transaction listeners
@@ -188,7 +188,7 @@ public class InputPane extends VBox{
 	}
 	
 	
-	// Makes buttons invisible and visible only when I need them
+	// Makes buttons invisible and visible
 	public void makeInvisible(Node n1,Node n2,Node n3,Node n4,Node n5,Node n6) {
 		n1.setVisible(false); n1.setManaged(false);
 		n2.setVisible(false); n2.setManaged(false);

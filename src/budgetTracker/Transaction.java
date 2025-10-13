@@ -7,7 +7,7 @@ import javafx.beans.property.*;
 
 public class Transaction{
 	/**
-	 * Changed private variables to Simple__Property to better assist GUI
+	 * Changed private variables to Simple__Property to use TableView for history
 	 */
 	
 	// Unique for each transaction

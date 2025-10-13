@@ -4,9 +4,7 @@ import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 
 public class TitlePane extends AnchorPane{
-	public TitlePane() {
-		Double tempRemainingBudget = 2.25; // TODO: replace with dynamic remaining value
-		
+	public TitlePane() {		
 		// Main Title
 		Label titleLabel = new Label("------ Budget Tracker ------");
 		HBox  titlePane = new HBox (titleLabel);
@@ -17,9 +15,8 @@ public class TitlePane extends AnchorPane{
 		
 		
 		// Shows remaining budget
-		//Label budgetLabel = new Label("Remaining Balance:  $" + Double.toString(tempRemainingBudget));
-		Label budgetLabel = new Label("Remaining Balance:  $ FIXME" );
-		setTopAnchor(budgetLabel, 100.0);
+		Label budgetLabel = new Label("Remaining Balance:  $ FIXME" ); // TODO: Make dynamic 
+		setTopAnchor(budgetLabel, 100.0);							   // total income - total expenses
 		setRightAnchor(budgetLabel, 200.0);
 		this.getChildren().add(budgetLabel);
 		
@@ -29,9 +26,7 @@ public class TitlePane extends AnchorPane{
 		setTopAnchor(statusLabel, 100.0);
 		setLeftAnchor(statusLabel, 250.0);
 		this.getChildren().add(statusLabel);
-		// TODO: Make dynamic
-		//Label statusValLabel = new Label(budget.getBudgetStatus());
-		Label statusValLabel = new Label("FIXME");
+		Label statusValLabel = new Label("FIXME"); // TODO: Make dynamic
 		setTopAnchor(statusValLabel, 100.0);
 		setLeftAnchor(statusValLabel, 300.0);
 		this.getChildren().add(statusValLabel);
