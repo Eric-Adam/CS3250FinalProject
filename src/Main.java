@@ -2,6 +2,7 @@
  * Fall 2025
  * Eric Adam
  * */
+
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
@@ -19,11 +20,11 @@ public class Main extends Application{
 	public void start(Stage primaryStage) throws Exception {
 		String stylesheet = getClass().getResource("styles/style.css").toExternalForm();
 		
-		Scene scene = new Scene(new RunGUI(), 1000, 700);
+		Scene scene = new Scene(new RunGUI(), 1000, 750);
 		scene.getStylesheets().add(stylesheet);
 		
 		primaryStage.setScene(scene);
-		primaryStage.setTitle("Adam's Budget Tracker");
+		primaryStage.setTitle("Adam's Expense Tracker");
 		primaryStage.show();
 	}
 		

@@ -1,5 +1,5 @@
 transactionAmount,category,note,income,date
-2520.0,VA,GI BIll,true,2025-10-11
+2520.0,VA,GI Bill,true,2025-10-11
 11.81,Subscriptions,Pandora,false,2025-10-09
 10.73,Subscriptions,ShopTitans,false,2025-10-09
 500.0,VA,GI Bill,true,2025-10-09
@@ -21,3 +21,7 @@ transactionAmount,category,note,income,date
 79.99,Subscriptions,Crunchyroll-Yr,false,2025-09-04
 1743.0,Rent,A318,false,2025-09-02
 200.0,Wife,Car Tow,false,2025-10-12
+6069.83,Miscellaneous,Initial Value,true,2025-09-01
+566.44,Miscellaneous,Title animation timer test,false,2025-10-13
+0.0,Miscellaneous,new animation timer,true,2025-10-13
+0.0,Miscellaneous,last test today,true,2025-10-13

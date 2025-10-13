@@ -1,36 +1,21 @@
-package myGUI;
+package budgetTracker;
 
-import java.io.*;
 import java.time.LocalDate;
 import java.util.*;
-import java.util.stream.Collectors;
-import budgetTracker.Transaction;
 import javafx.animation.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.SortedList;
 import javafx.scene.control.*;
-import javafx.util.Duration;
 
 public class HistoryTable extends TableView<Transaction>{
     private final ObservableList<Transaction> observableList = FXCollections.observableArrayList();
-
+    private final Budget budget = new Budget();
 	
 	@SuppressWarnings("unchecked")
 	public HistoryTable() {
-		// Pull data from CSV
-		List<String[]> historyData = loadCSV();
-		
-		// Convert data to List of Transaction objects
-		List<Transaction> transactions = historyData.stream()
-		    .skip(1) // skips header
-		    .map(row -> new Transaction(Double.parseDouble(row[0]), 
-		    							row[1], 
-		    							row[2], 
-		    							Boolean.parseBoolean(row[3]), 
-		    							LocalDate.parse(row[4])))
-		    .collect(Collectors.toList());
-		observableList.setAll(transactions);
+		// Create Budget object
+		observableList.setAll(budget.observableList);
 		
 		// Set up TableView		
 		// --- Tableview Columns
@@ -67,7 +52,12 @@ public class HistoryTable extends TableView<Transaction>{
 		// --- --- Date column
 		TableColumn<Transaction, LocalDate> dateColumn = new TableColumn<>("Date");
 		dateColumn.setCellValueFactory(cellData -> cellData.getValue().dateProperty());
-		dateColumn.prefWidthProperty().bind(this.widthProperty().multiply(0.2)); 
+		dateColumn.prefWidthProperty().bind(this.widthProperty().multiply(0.15)); 
+		
+		// --- --- Income column
+		TableColumn<Transaction, Boolean> incomeColumn = new TableColumn<>("Income");
+		incomeColumn.setCellValueFactory(cellData -> cellData.getValue().incomeProperty());
+		incomeColumn.prefWidthProperty().bind(this.widthProperty().multiply(0.1));
 		
 
 		// --- Set column alignment
@@ -126,9 +116,29 @@ public class HistoryTable extends TableView<Transaction>{
 		    }
 		});
 		
+		// Change income column to checkboxes instead of boolean values
+		incomeColumn.setCellFactory(col -> new TableCell<Transaction, Boolean>() {
+		    private final CheckBox checkBox = new CheckBox();
+		    {
+		        checkBox.setDisable(true); // Read only for now
+		        setStyle("-fx-alignment: CENTER;");
+		    }
+
+		    @Override
+		    protected void updateItem(Boolean item, boolean empty) {
+		        super.updateItem(item, empty);
+		        if (empty || item == null) {
+		            setGraphic(null);
+		        } else {
+		            checkBox.setSelected(item);
+		            setGraphic(checkBox);
+		        }
+		    }
+		});
+		
 		// --- Add columns to tableview
 		this.getColumns().addAll(indexColumn,categoryColumn,amountColumn, 
-									  noteColumn,dateColumn);
+									  noteColumn,dateColumn,incomeColumn);
 		
 		// Sort the list by wrapping in a SortedList
 		SortedList<Transaction> sortedList = new SortedList<>(observableList);
@@ -137,50 +147,26 @@ public class HistoryTable extends TableView<Transaction>{
 		// Set data for tableview
 		this.setItems(sortedList);
 		
-		// Auto-refresh every 5 seconds
-		Timeline refresher = new Timeline(
-		    new KeyFrame(Duration.seconds(5), e -> refreshTable())
-		);
-		refresher.setCycleCount(Animation.INDEFINITE); 
-		refresher.play();
+		// Make the table refresh
+		refreshTable(false);
 	}
 
-
-	// Loads data from CSV file as unparsed strings 
-	// TODO: Can't handle commas in note, think of work around
-	private List<String[]> loadCSV() {
-		String filePath = "src/resources/transactionDB.csv"; 
-        List<String[]> rows = new ArrayList<>();
-
-        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
-            String line;
-
-            while ((line = br.readLine()) != null) {
-                String[] values = line.split(",");
-                rows.add(values); 
-            }
-        } catch (Exception e) {
-            System.out.println("Failed to load CSV data:\n"+e);
-        }
-        return rows;	
-	}
 	
 	// Refreshes table contents for when a transaction is added/deleted/edited
-	public void refreshTable() {
-	    List<String[]> historyData = loadCSV();
-
-	    List<Transaction> transactions = historyData.stream()
-	        .skip(1)
-	        .map(row -> new Transaction(
-	            Double.parseDouble(row[0]),
-	            row[1],
-	            row[2],
-	            Boolean.parseBoolean(row[3]),
-	            LocalDate.parse(row[4])
-	        ))
-	        .collect(Collectors.toList());
-
-	    observableList.setAll(transactions); 
+	public void refreshTable(Boolean disable) {
+		new AnimationTimer() {
+			long lastUpdate = System.nanoTime();
+			private final long DELAY = 1_000_000_000; // 1 second
+			
+			@Override
+			public void handle(long now) {
+				
+				if ((now - lastUpdate >= DELAY) && !disable) {
+					budget.refreshData(); 
+					observableList.setAll(budget.observableList);
+				    lastUpdate = now;
+				}
+			}
+		}.start();
 	}
-
 }
