@@ -2,7 +2,6 @@ package budgetTracker;
 
 import java.time.LocalDate;
 import java.util.*;
-import javafx.animation.*;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.SortedList;
@@ -10,11 +9,12 @@ import javafx.scene.control.*;
 
 public class HistoryTable extends TableView<Transaction>{
     private final ObservableList<Transaction> observableList = FXCollections.observableArrayList();
-    private final Budget budget = new Budget();
+    private final Budget budget;
 	
 	@SuppressWarnings("unchecked")
-	public HistoryTable() {
-		// Create Budget object
+	public HistoryTable(Budget b) {
+		// Assign Budget object
+		budget = b;
 		observableList.setAll(budget.observableList);
 		
 		// Set up TableView		
@@ -142,31 +142,15 @@ public class HistoryTable extends TableView<Transaction>{
 		
 		// Sort the list by wrapping in a SortedList
 		SortedList<Transaction> sortedList = new SortedList<>(observableList);
-		sortedList.setComparator(Comparator.comparing(Transaction::getDate).reversed());
+		sortedList.setComparator(Comparator.comparing(Transaction::getTransactionID).reversed());
 		
 		// Set data for tableview
 		this.setItems(sortedList);
-		
-		// Make the table refresh
-		refreshTable(false);
 	}
-
 	
-	// Refreshes table contents for when a transaction is added/deleted/edited
-	public void refreshTable(Boolean disable) {
-		new AnimationTimer() {
-			long lastUpdate = System.nanoTime();
-			private final long DELAY = 1_000_000_000; // 1 second
-			
-			@Override
-			public void handle(long now) {
-				
-				if ((now - lastUpdate >= DELAY) && !disable) {
-					budget.refreshData(); 
-					observableList.setAll(budget.observableList);
-				    lastUpdate = now;
-				}
-			}
-		}.start();
+	public void update() {
+		budget.refreshData();
+		observableList.setAll(budget.observableList);
 	}
+	
 }

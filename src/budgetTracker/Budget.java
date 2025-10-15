@@ -1,13 +1,11 @@
 package budgetTracker;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
-
-import javax.swing.JOptionPane;
-
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -15,80 +13,19 @@ public class Budget {
 	private double budgetMax=0;
 	private ArrayList<Transaction> income = new ArrayList<Transaction>();
 	private ArrayList<Transaction> expenses = new ArrayList<Transaction>();
-	private List<Transaction> transactions = null;
+	private List<Transaction> transactions;
     public final ObservableList<Transaction> observableList = FXCollections.observableArrayList();
+    private final String filePath;
 
-
-	
-	public Budget() {
+	public Budget(String filePath) {
 		// Load data
-		loadTransactions();
-		
-		// Fill income/expense lists
-		for (Transaction t : transactions) {
-			if (t.isIncome())
-				income.add(t);
-			else 
-				expenses.add(t);
-		}	
-		
-		for (Transaction t : income)
-			budgetMax += t.getTransactionAmount();
-		
-		
-		
+		this.filePath = filePath;
+		loadTransactions();		
 	}	
 	
-	// Loads data from CSV file as unparsed strings 
-	// TODO: Can't handle commas in note, think of work around
-	private List<String[]> loadCSV() {
-		String filePath = "src/resources/transactionDB.csv"; 
-        List<String[]> rows = new ArrayList<>();
-
-        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
-            String line;
-
-            while ((line = br.readLine()) != null) {
-                String[] values = line.split(",");
-                rows.add(values); 
-            }
-        } catch (Exception e) {
-            System.out.println("Failed to load CSV data:\n"+e);
-        }
-        return rows;	
-	}
-
-
 	public double getBudgetMax() {
 		return budgetMax;
 	}
-	public void setBudgetMax(double budgetMax) {
-		this.budgetMax = budgetMax;
-	}
-	
-	// Adds tracked transactions
-	public void addIncome(Transaction income) {
-        this.income.add(income);
-        JOptionPane.showMessageDialog(null, 
-        		"$"+income.getTransactionAmount()+" added to income");
-    }
-    public void addExpense(Transaction expense) {
-        this.expenses.add(expense);
-        JOptionPane.showMessageDialog(null, 
-        		"Expense of $"+expense.getTransactionAmount()+" added.");
-    }
-    
-    // Removes tracked transactions
-	public void removeIncome(Transaction in) {
-        income.remove(in);
-        JOptionPane.showMessageDialog(null, 
-        		"$"+in.getTransactionAmount()+" removed from income");
-    }
-    public void removeExpense(Transaction expense) {
-        expenses.remove(expense);
-        JOptionPane.showMessageDialog(null, 
-        		"Expense of $"+expense.getTransactionAmount()+" removed.");
-    }
 
     public double getOverallBalance() {
     	double runningIncome = 0;
@@ -138,12 +75,42 @@ public class Budget {
 		    							LocalDate.parse(row[4])))
 		    .collect(Collectors.toList());
 		observableList.setAll(transactions);
-    }
+		
+		// Fill income/expense lists
+		for (Transaction t : transactions) {
+			if (t.isIncome())
+				income.add(t);
+			else 
+				expenses.add(t);
+		}
+		for (Transaction t : income)
+			budgetMax += t.getTransactionAmount();
+	}
+    
+	// Loads data from CSV file as unparsed strings 
+	// TODO: Can't handle commas in note, think of work around
+	private List<String[]> loadCSV() {
+        List<String[]> rows = new ArrayList<>();
+
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            String line;
+
+            while ((line = br.readLine()) != null) {
+                String[] values = line.split(",");
+                rows.add(values); 
+            }
+        } catch (Exception e) {
+            System.out.println("Failed to load CSV data:\n"+e);
+        }
+        return rows;	
+	}
  
     public void refreshData() {
     	// Clear old data and reload
-        observableList.clear();
+    	transactions.clear();
+    	income.clear();
+    	expenses.clear();
+    	observableList.clear();
         loadTransactions();
     }
-
 }

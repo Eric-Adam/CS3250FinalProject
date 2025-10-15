@@ -1,15 +1,22 @@
 package myGUI;
 
 import budgetTracker.Budget;
-import javafx.animation.AnimationTimer;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 
 public class TitlePane extends AnchorPane{
+	private String status;
+	private String balance;
+	private Budget budget;
+	
+	private Label balanceLabel = new Label();
+	private Label statusLabel = new Label();
     
-	public TitlePane() {
-		Budget budget = new Budget();
+	public TitlePane(Budget budget) {
+		// Set budget
+		this.budget = budget;
+		
 		// Main Title
 		Label titleLabel = new Label("------ Budget Tracker ------");
 		HBox  titlePane = new HBox (titleLabel);
@@ -20,38 +27,26 @@ public class TitlePane extends AnchorPane{
 		
 		
 		// Show remaining budget
-		String formattedBalance = String.format("%.2f", budget.getOverallBalance());
-		Label balanceLabel = new Label("Remaining Balance:\t$ " + formattedBalance); 
+		balance = String.format("%.2f", budget.getOverallBalance());
+		balanceLabel.setText("Remaining Balance:\t$ " + balance); 
 		setTopAnchor(balanceLabel, 100.0);							 
 		setRightAnchor(balanceLabel, 200.0);
 		this.getChildren().add(balanceLabel);
 		
 
 		// Show status of the budget
-		String status = budget.getBudgetStatus();
-		Label statusLabel = new Label("Status:\t" + status);
+		status = budget.getBudgetStatus();
+		statusLabel.setText("Status:\t" + status);
 		setTopAnchor(statusLabel, 100.0);
 		setLeftAnchor(statusLabel, 250.0);
 		this.getChildren().add(statusLabel);
-		
-		// Refresh status and balance
-		new AnimationTimer() {
-			long lastUpdate = System.nanoTime();
-			private final long DELAY = 1_000_000_000; // 1 second
-			
-			@Override
-			public void handle(long now) {
-				if(now - lastUpdate >= DELAY) {
-					Budget newBudget = new Budget();
-					String newStatus = newBudget.getBudgetStatus();
-					String newFormattedBalance = String.format("%.2f", newBudget.getOverallBalance());
-					
-					statusLabel.setText("Status:\t" + newStatus);
-					balanceLabel.setText("Remaining Balance:\t$ " + newFormattedBalance);
-					lastUpdate = now;
-				}
-			}
-			
-		}.start();
 	}	
+	
+	public void update() {
+		budget.refreshData();
+		balance = String.format("%.2f", budget.getOverallBalance());
+		status = budget.getBudgetStatus();
+		balanceLabel.setText("Remaining Balance:\t$ " + balance); 
+		statusLabel.setText("Status:\t" + status);
+	}
 }

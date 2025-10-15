@@ -1,5 +1,7 @@
 package myGUI;
 import java.time.LocalDate;
+
+import budgetTracker.HistoryTable;
 import budgetTracker.Transaction;
 import javafx.scene.Node;
 import javafx.scene.control.*;
@@ -14,6 +16,15 @@ public class InputPane extends VBox{
 		 "Takeout/Delivery","Travel","Utilities","VA","Wife",
 		 "Miscellaneous"};
 			
+	private HistoryTable historyTable;
+	private TitlePane title;
+	
+	public void setHistoryTable(HistoryTable historyTable) {
+		this.historyTable = historyTable;
+	}
+	public void setTitle(TitlePane title) {
+		this.title = title;
+	}
 	
 	public InputPane() {
 		super(20);
@@ -134,7 +145,7 @@ public class InputPane extends VBox{
 		
 		// --- --- Submit Transaction - pulls data from fields and creates a new transaction
 		submitTransactionButton.setOnAction(e->{
-			String file = "src/resources/transactionDB.csv";
+			String file = "src/resources/transactionDB.csv"; // TODO: change to shared filepath
 			double amountEntry = Double.parseDouble(newTransactionAmountText.getText());
 			String categoryEntry = transactionCategory.getValue();
 			String noteEntry = newNoteField.getText();
@@ -153,6 +164,10 @@ public class InputPane extends VBox{
 			addNewTransactionButton.setSelected(false);
 			makeInvisible(newTransactionBudgetEntry,newTransactionAmountEntry,noteHbox,
 					newTransactionDate,submitCancelTransaction,newTransactionTypeEntry);
+			
+			historyTable.update();
+			title.update();
+			
 		});
 		
 		// --- --- Cancel Transaction - Resets defaults and closes new transaction
@@ -173,7 +188,7 @@ public class InputPane extends VBox{
 		
 		// --- Save chart listener - Captures currently selected chart 
 		saveChartButton.setOnAction(e -> {
-			String[] fileNames = {"30DayLinear.jpg", "CategoryPie.jpg", "inVsOutBar.jpg"};
+			String[] fileNames = {"30DayLinear.jpg", "CategoryPie.jpg", "inVsOutBar.jpg"}; // TODO: add format to user
 			String chartFileName;
 			String chartNameCapture = chartTypeComboBox.getValue();
 			if(chartNameCapture.equalsIgnoreCase("30-Day Transactions"))
