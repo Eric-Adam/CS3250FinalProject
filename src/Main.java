@@ -20,7 +20,7 @@ public class Main extends Application{
 	public void start(Stage primaryStage) throws Exception {
 		String stylesheet = getClass().getResource("styles/style.css").toExternalForm();
 		
-		Scene scene = new Scene(new RunGUI(primaryStage), 400, 150);
+		Scene scene = new Scene(new RunGUI(primaryStage), 350.0, 200.0);
 		scene.getStylesheets().add(stylesheet);
 		System.out.println(scene.getRoot());
 		primaryStage.setScene(scene);
