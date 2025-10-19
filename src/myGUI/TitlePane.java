@@ -4,6 +4,7 @@ import budgetTracker.Budget;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.layout.*;
+import javafx.stage.Stage;
 
 public class TitlePane extends AnchorPane{
 	private String status;
@@ -12,9 +13,13 @@ public class TitlePane extends AnchorPane{
 	
 	private Label balanceLabel = new Label();
 	private Label statusLabel = new Label();
+	
+	private Stage primaryStage;
+	private RunGUI runGUI;
     
-	public TitlePane(Budget budget) {
-		// Set budget
+	public TitlePane(Stage primaryStage, RunGUI runGUI, Budget budget) {
+		this.primaryStage = primaryStage;
+		this.runGUI = runGUI;
 		this.budget = budget;
 		
 		// Main Title
@@ -48,5 +53,10 @@ public class TitlePane extends AnchorPane{
 		status = budget.getBudgetStatus();
 		balanceLabel.setText("Remaining Balance:\t$ " + balance); 
 		statusLabel.setText("Status:\t" + status);
+	}
+	
+	// TODO: Switch to User Page
+	private void logOut() {
+		
 	}
 }

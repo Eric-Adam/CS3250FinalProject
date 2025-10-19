@@ -12,10 +12,10 @@ public class HistoryTable extends TableView<Transaction>{
     private final Budget budget;
 	
 	@SuppressWarnings("unchecked")
-	public HistoryTable(Budget b) {
+	public HistoryTable(Budget budget) {
 		// Assign Budget object
-		budget = b;
-		observableList.setAll(budget.observableList);
+		this.budget = budget;
+		this.observableList.setAll(budget.observableList);
 		
 		// Set up TableView		
 		// --- Tableview Columns

@@ -1,3 +1,4 @@
-username, password, filePaths
-Eric Adam,letMeIn,src/resources/ericadamDB.csv
-Enrique Addame,letMeIn,src/resources/enriqueaddameDB.csv
+username,filePath
+Eric Adam,src/resources/ericadamDB.csv
+Enrique Addame,src/resources/enriqueaddameDB.csv
+new test,src/resources/newtestDB.csv

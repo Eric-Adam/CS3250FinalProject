@@ -23,6 +23,9 @@ public class Budget {
 		loadTransactions();		
 	}	
 	
+	public String getFilePath() {
+		return this.filePath;
+	}
 	public double getBudgetMax() {
 		return budgetMax;
 	}

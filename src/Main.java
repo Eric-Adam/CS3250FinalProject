@@ -22,7 +22,6 @@ public class Main extends Application{
 		
 		Scene scene = new Scene(new RunGUI(primaryStage), 350.0, 200.0);
 		scene.getStylesheets().add(stylesheet);
-		System.out.println(scene.getRoot());
 		primaryStage.setScene(scene);
 		primaryStage.setTitle("Adam's Expense Tracker");
 		primaryStage.show();

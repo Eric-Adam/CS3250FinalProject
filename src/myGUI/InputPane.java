@@ -1,6 +1,7 @@
 package myGUI;
 import java.time.LocalDate;
 
+import budgetTracker.Budget;
 import budgetTracker.HistoryTable;
 import budgetTracker.Transaction;
 import javafx.scene.Node;
@@ -26,7 +27,7 @@ public class InputPane extends VBox{
 		this.title = title;
 	}
 	
-	public InputPane() {
+	public InputPane(Budget budget) {
 		super(20);
 		// -----------------------------------Transaction Section ---------------------------------
 		// Transaction control buttons
@@ -145,7 +146,7 @@ public class InputPane extends VBox{
 		
 		// --- --- Submit Transaction - pulls data from fields and creates a new transaction
 		submitTransactionButton.setOnAction(e->{
-			String file = "src/resources/transactionDB.csv"; // TODO: change to shared filepath
+			String file = budget.getFilePath();
 			double amountEntry = Double.parseDouble(newTransactionAmountText.getText());
 			String categoryEntry = transactionCategory.getValue();
 			String noteEntry = newNoteField.getText();
