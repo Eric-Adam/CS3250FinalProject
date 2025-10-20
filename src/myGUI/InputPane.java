@@ -2,6 +2,7 @@ package myGUI;
 import java.time.LocalDate;
 
 import budgetTracker.Budget;
+import budgetTracker.BuildChart;
 import budgetTracker.HistoryTable;
 import budgetTracker.Transaction;
 import javafx.scene.Node;
@@ -18,6 +19,7 @@ public class InputPane extends VBox{
 		 "Miscellaneous"};
 			
 	private HistoryTable historyTable;
+	private ChartPane chartPane;
 	private TitlePane title;
 	
 	public void setHistoryTable(HistoryTable historyTable) {
@@ -25,6 +27,9 @@ public class InputPane extends VBox{
 	}
 	public void setTitle(TitlePane title) {
 		this.title = title;
+	}
+	public void setChart(ChartPane chartPane) {
+		this.chartPane = chartPane;
 	}
 	
 	public InputPane(Budget budget) {
@@ -168,6 +173,7 @@ public class InputPane extends VBox{
 			
 			historyTable.update();
 			title.update();
+			chartPane.update();
 			
 		});
 		
@@ -189,7 +195,7 @@ public class InputPane extends VBox{
 		
 		// --- Save chart listener - Captures currently selected chart 
 		saveChartButton.setOnAction(e -> {
-			String[] fileNames = {"30DayLinear.jpg", "CategoryPie.jpg", "inVsOutBar.jpg"}; // TODO: add format to user
+			String[] fileNames = {"30DayLinear.jpg", "CategoryPie.jpg", "inVsOutBar.jpg"};
 			String chartFileName;
 			String chartNameCapture = chartTypeComboBox.getValue();
 			if(chartNameCapture.equalsIgnoreCase("30-Day Transactions"))
@@ -199,10 +205,15 @@ public class InputPane extends VBox{
 			else 
 				chartFileName = fileNames[2];
 			
-			// TODO: Create jpg from selected chart; need charts
+			saveChart(chartFileName);
         });
 	}
 	
+	// TODO: Save Chart
+	private void saveChart(String fileName) {
+		
+		
+	}
 	
 	// Makes buttons invisible and visible
 	public void makeInvisible(Node n1,Node n2,Node n3,Node n4,Node n5,Node n6) {
@@ -221,5 +232,7 @@ public class InputPane extends VBox{
 		n5.setVisible(true); n5.setManaged(true);
 		n6.setVisible(true); n6.setManaged(true);
 	}
+
+
 	
 }

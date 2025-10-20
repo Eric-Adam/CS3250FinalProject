@@ -9,7 +9,6 @@ import javafx.stage.Stage;
 import myGUI.*;
 
 public class Main extends Application{
-	//public static final String DB_FILENAME = "src/resources/transactionDB.csv";
 	
 	public static void main(String[] args) {
 		launch(args);

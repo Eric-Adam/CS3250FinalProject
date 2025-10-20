@@ -91,7 +91,6 @@ public class Budget {
 	}
     
 	// Loads data from CSV file as unparsed strings 
-	// TODO: Can't handle commas in note, think of work around
 	private List<String[]> loadCSV() {
         List<String[]> rows = new ArrayList<>();
 

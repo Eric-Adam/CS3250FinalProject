@@ -3,11 +3,10 @@ package myGUI;
 import budgetTracker.Budget;
 import javafx.geometry.Insets;
 import javafx.scene.layout.*;
-import javafx.stage.Stage;
 
 public class TrackerPage extends BorderPane{
 	
-	public TrackerPage(Stage primaryStage, RunGUI runGUI, String filePath) {
+	public TrackerPage(RunGUI runGUI, String filePath) {
 	Budget budget = new Budget(filePath);
 	
 	// Padding
@@ -16,8 +15,8 @@ public class TrackerPage extends BorderPane{
 	Insets chartInsets = new Insets(25,10,25,10);
 	Insets historyInsets = new Insets(25,10,10,10);
 	
-	// Top: Title, Status, Selected Budget
-	TitlePane titlePane = new TitlePane(primaryStage, runGUI, budget);
+	// Top: Title, Status, Balance, Logout
+	TitlePane titlePane = new TitlePane(runGUI, budget);
 	titlePane.setPadding(titleInsets);
 	this.setTop(titlePane);
 	
@@ -27,7 +26,7 @@ public class TrackerPage extends BorderPane{
 	this.setBottom(historyPane);
 	
     // Center: Budget Charts
-	ChartPane chartPane = new ChartPane();
+	ChartPane chartPane = new ChartPane(budget);
 	chartPane.setMinSize(300, 300);
 	chartPane.setPadding(chartInsets);
 	chartPane.setMaxHeight(500);
@@ -38,6 +37,7 @@ public class TrackerPage extends BorderPane{
 	inputPane.setPadding(inputInsets);
 	inputPane.setHistoryTable(historyPane.getHistoryTable());
 	inputPane.setTitle(titlePane);
+	inputPane.setChart(chartPane);
 	this.setLeft(inputPane);
 	}
 }

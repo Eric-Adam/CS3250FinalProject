@@ -86,6 +86,7 @@ public class UserCoverPage extends AnchorPane{
 				resizeWindow(200, 500);
 				
 				// Set default values
+				loadUserData();
 				selectUserCombo.getItems().setAll(usernames);
 				selectUserCombo.setValue("Username");
 
@@ -98,7 +99,6 @@ public class UserCoverPage extends AnchorPane{
 				    }
 				});
 				
-				
 		        }
 			else {
 				// Close login
@@ -110,9 +110,12 @@ public class UserCoverPage extends AnchorPane{
 		// --- Enter Button in Login Section
 		enterButton.setOnAction(e->{
 			String selectedUser = selectUserCombo.getValue();
+			makeInvisible(selectUserVbox);
+			loginButton.setSelected(false);
 			
 			if (!selectedUser.equals("Username")) {
 				String filePath = filePaths.get(usernames.indexOf(selectedUser));
+				runGUI.setUser(selectedUser);
 				runGUI.switchToTracker(filePath);
 			}
 		});
@@ -148,8 +151,13 @@ public class UserCoverPage extends AnchorPane{
 				Double initialAmount = Double.parseDouble(initialValueField.getText());
 				String firstName = fNameField.getText();
 				String lastName = lNameField.getText();
+				runGUI.setUser(firstName+" "+lastName);
 				createNewUser(initialAmount, firstName, lastName);
 			}
+			
+			initialValueField.setText("0.00");
+			fNameField.setText("");
+			lNameField.setText("");
 			
 			makeInvisible(fNameHbox, lNameHbox, initialValueHbox, submitUserButton);
 			newUserButton.setSelected(false);
@@ -164,8 +172,6 @@ public class UserCoverPage extends AnchorPane{
 		
 		
 	}
-	
-	
 	
 	// Creates new user
 	private void createNewUser(Double initialAmount, String fName, String lName) {
@@ -198,7 +204,7 @@ public class UserCoverPage extends AnchorPane{
 	
 	
 	// Appends to CSV
-	public static void saveToCSV(File file, List<String> arr) {		
+	public static void saveToCSV(File file, List<String> arr) {			
 		try (FileWriter writer = new FileWriter(file, true)) {
 			for (int i = 0; i < arr.size(); i++) {
 		        writer.append(arr.get(i));
@@ -213,16 +219,21 @@ public class UserCoverPage extends AnchorPane{
 		}
 	}
 	    
-	// Escapes double quotes 
+	// Escapes double quotes and removes commas
 	private static String escapeForCSV(String value) {
-	    if (value.contains(",") || value.contains("\"")) {
-	        value = value.replace("\"", "\"\""); 
+		if (value.contains(",") || value.contains("\"")) {
+	        value = value.replace("\"", "\"\"");
+	        value = value.replace(",", "");
 	        return "\"" + value + "\"";
 	    }
+	    
 	    return value;
 	}
 	
-	private void loadUserData() {// TODO: Can't handle commas, think of work around
+	private void loadUserData() {
+		usernames.clear();
+		filePaths.clear();
+		
         try (BufferedReader br = new BufferedReader(new FileReader(userFile))) {
             String line;
             int count = 0;
@@ -239,6 +250,8 @@ public class UserCoverPage extends AnchorPane{
         }
 	}
 	
+	
+	// Make sections appear and disappear
 	private void makeVisible(Node n1) {
 		n1.setVisible(true); n1.setManaged(true);
 	}
@@ -259,6 +272,7 @@ public class UserCoverPage extends AnchorPane{
 		n4.setVisible(false); n4.setManaged(false);
 	}
 	
+	// Change window size to fit appearing/disappearing nodes
 	private void resizeWindow(double height, double width) {
 		primaryStage.setHeight(height);
 		primaryStage.setWidth(width);

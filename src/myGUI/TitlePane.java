@@ -2,9 +2,9 @@ package myGUI;
 
 import budgetTracker.Budget;
 import javafx.geometry.Pos;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.*;
-import javafx.stage.Stage;
 
 public class TitlePane extends AnchorPane{
 	private String status;
@@ -14,22 +14,18 @@ public class TitlePane extends AnchorPane{
 	private Label balanceLabel = new Label();
 	private Label statusLabel = new Label();
 	
-	private Stage primaryStage;
-	private RunGUI runGUI;
     
-	public TitlePane(Stage primaryStage, RunGUI runGUI, Budget budget) {
-		this.primaryStage = primaryStage;
-		this.runGUI = runGUI;
+	public TitlePane(RunGUI runGUI, Budget budget) {
 		this.budget = budget;
 		
 		// Main Title
-		Label titleLabel = new Label("------ Budget Tracker ------");
+		String welcomeMessage = "------ Welcome "+runGUI.getUser()+" ------";
+		Label titleLabel = new Label(welcomeMessage);
 		HBox  titlePane = new HBox (titleLabel);
 		titlePane.setAlignment(Pos.CENTER);
 		titlePane.setPrefWidth(1000.0);
 		setTopAnchor(titlePane, 50.0);
 		this.getChildren().add(titlePane);
-		
 		
 		// Show remaining budget
 		balance = String.format("%.2f", budget.getOverallBalance());
@@ -37,7 +33,6 @@ public class TitlePane extends AnchorPane{
 		setTopAnchor(balanceLabel, 100.0);							 
 		setRightAnchor(balanceLabel, 200.0);
 		this.getChildren().add(balanceLabel);
-		
 
 		// Show status of the budget
 		status = budget.getBudgetStatus();
@@ -45,6 +40,18 @@ public class TitlePane extends AnchorPane{
 		setTopAnchor(statusLabel, 100.0);
 		setLeftAnchor(statusLabel, 250.0);
 		this.getChildren().add(statusLabel);
+		
+		// Logout
+		Button logoutButton = new Button("Log Out");
+		setTopAnchor(logoutButton, 25.0);
+		setRightAnchor(logoutButton, 50.0);
+		this.getChildren().add(logoutButton);
+		
+		// Listener
+		logoutButton.setOnAction(e->{
+			runGUI.switchToUser();
+		});
+
 	}	
 	
 	public void update() {
@@ -55,8 +62,4 @@ public class TitlePane extends AnchorPane{
 		statusLabel.setText("Status:\t" + status);
 	}
 	
-	// TODO: Switch to User Page
-	private void logOut() {
-		
-	}
 }

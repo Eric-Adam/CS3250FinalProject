@@ -85,12 +85,14 @@ public class Transaction{
 		}
 	}
     
-	// Escapes double quotes 
+	// Escapes double quotes and removes commas
 	private static String escapeForCSV(String value) {
 	    if (value.contains(",") || value.contains("\"")) {
-	        value = value.replace("\"", "\"\""); 
+	        value = value.replace("\"", "\"\"");
+	        value = value.replace(",", "");
 	        return "\"" + value + "\"";
-	    }
+	    }	
+
 	    return value;
 	}
 }
