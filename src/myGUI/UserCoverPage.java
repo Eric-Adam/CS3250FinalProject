@@ -226,6 +226,8 @@ public class UserCoverPage extends AnchorPane{
 	        value = value.replace(",", "");
 	        return "\"" + value + "\"";
 	    }
+	    if (value.contains(","))
+    		value = value.replace(",", "");
 	    
 	    return value;
 	}

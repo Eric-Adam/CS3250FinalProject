@@ -1,28 +1,21 @@
 package myGUI;
 
-import budgetTracker.Budget;
-import javafx.scene.control.Label;
+import budgetTracker.*;
 import javafx.scene.layout.StackPane;
 
 public class ChartPane extends StackPane{
-	private Budget budget;
+	private BuildChart charts;
 	
 	public ChartPane(Budget budget) {
-		this.budget = budget;
+		this.charts = new BuildChart(budget);
+		this.getChildren().add(charts);
 		
-	for (int i=0; i<5; i++) {// TODO: replace with charts
-		Label label = new Label(Integer.toString(i));
-		label.setPrefWidth(300 -i*30);
-		label.setPrefHeight(300 - i*30);
-		label.setStyle("-fx-border-color:black;");
-		this.getChildren().add(label);
-		}
+		charts.showPieChart();
 	}
 	
-	
-	// Update values for budget
 	public void update() {
-		// TODO Auto-generated method stub
-		
-	}		
+		charts.createLineChart();
+		charts.createPieChart();
+		charts.createBarChart();
+	}
 }

@@ -17,8 +17,8 @@ transactionAmount,category,note,income,date
 9.99,Subscriptions,Doordash,false,2025-09-30
 10.98,Groceries,Hotdog stuff,false,2025-10-01
 1791.14,Wife,Transfer,false,2025-10-06
-500.0,VA,GI Bill,true,2025-10-09
+500.0,VA,GI Bill,false,2025-10-09
 10.73,Subscriptions,ShopTitans,false,2025-10-09
 11.81,Subscriptions,Pandora,false,2025-10-09
-5202.0,VA,GI Bill,true,2025-10-11
-200.0,Wife,Car Tow,false,2025-10-12
+1202.0,VA,GI Bill,false,2025-10-11
+200.0,Wife,Car Tow,true,2025-10-12

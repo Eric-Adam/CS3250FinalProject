@@ -92,7 +92,8 @@ public class Transaction{
 	        value = value.replace(",", "");
 	        return "\"" + value + "\"";
 	    }	
-
+	    if (value.contains(","))
+	    		value = value.replace(",", "");
 	    return value;
 	}
 }
