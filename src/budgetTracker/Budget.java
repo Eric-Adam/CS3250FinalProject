@@ -26,27 +26,34 @@ public class Budget {
 	public String getFilePath() {
 		return this.filePath;
 	}
-	public double getBudgetMax() {
-		return budgetMax;
-	}
+
 
     public double getOverallBalance() {
-    	double runningIncome = 0;
-    	double runningExpense = 0;
     	double balance = 0;
+    	double tempAmount =0;
     	
-    	for (Transaction in: income) {
-    		runningIncome += in.getTransactionAmount();
+    	for (Transaction transaction : transactions) {
+        		tempAmount = transaction.getTransactionAmount();
+        		balance += (transaction.isIncome()) ? tempAmount : -tempAmount;
     	}
-    	for (Transaction out: expenses) {
-    		runningExpense += out.getTransactionAmount();
-    	}
-    	balance = runningIncome - runningExpense;
         
-    	if(balance > 0)
-    		return balance;
-    	else
-    		return 0.0;
+    	if(balance > 0) return balance;
+    	else return 0.0;
+    }
+    
+    public double getEarlierBalance(LocalDate startDate) {
+    	double balance = 0;
+    	double tempAmount =0;
+    	
+    	for (Transaction transaction : transactions) {
+        	if (transaction.getDate().isBefore(startDate)) {
+        		tempAmount = transaction.getTransactionAmount();
+        		balance += (transaction.isIncome()) ? tempAmount : -tempAmount;
+        	}
+    	}
+        
+    	if(balance > 0) return balance;
+    	else return 0.0;
     }
     
     public String getBudgetStatus() {

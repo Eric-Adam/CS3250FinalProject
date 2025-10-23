@@ -4,16 +4,18 @@ import budgetTracker.*;
 import javafx.scene.layout.StackPane;
 
 public class ChartPane extends StackPane{
-	private BuildChart charts;
+	private BuildCharts charts;
+	private Budget budget;
 	
 	public ChartPane(Budget budget) {
-		this.charts = new BuildChart(budget);
-		this.getChildren().add(charts);
-		
-		charts.showPieChart();
+		this.budget = budget;
+		this.charts = new BuildCharts(budget);
+		this.getChildren().add(charts);	
+		charts.showLineChart();
 	}
 	
 	public void update() {
+		budget.refreshData();
 		charts.createLineChart();
 		charts.createPieChart();
 		charts.createBarChart();

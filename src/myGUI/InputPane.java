@@ -2,7 +2,6 @@ package myGUI;
 import java.time.LocalDate;
 
 import budgetTracker.Budget;
-import budgetTracker.BuildChart;
 import budgetTracker.HistoryTable;
 import budgetTracker.Transaction;
 import javafx.scene.Node;
@@ -140,6 +139,16 @@ public class InputPane extends VBox{
             	makeInvisible(newTransactionBudgetEntry,newTransactionAmountEntry,noteHbox,
 						newTransactionDate,submitCancelTransaction,newTransactionTypeEntry);
             }
+			
+			// Close addNewTransaction section if you hover over the historyTable
+			// Listener in listener to avoid historyTable being null
+			historyTable.hoverProperty().addListener((observable, wasHovering, isNowHovering) -> {
+			    if (isNowHovering) {
+			    	addNewTransactionButton.setSelected(false);
+			    	makeInvisible(newTransactionBudgetEntry,newTransactionAmountEntry,noteHbox,
+							newTransactionDate,submitCancelTransaction,newTransactionTypeEntry);
+			    }
+			});
         });
 		
 		// --- --- Transaction amount entry - forces entry to be valid
@@ -171,9 +180,7 @@ public class InputPane extends VBox{
 			makeInvisible(newTransactionBudgetEntry,newTransactionAmountEntry,noteHbox,
 					newTransactionDate,submitCancelTransaction,newTransactionTypeEntry);
 			
-			historyTable.update();
-			title.update();
-			chartPane.update();
+			update();
 			
 		});
 		
@@ -207,6 +214,7 @@ public class InputPane extends VBox{
 			
 			saveChart(chartFileName);
         });
+	
 	}
 	
 	// TODO: Save Chart
@@ -233,6 +241,11 @@ public class InputPane extends VBox{
 		n6.setVisible(true); n6.setManaged(true);
 	}
 
+	private void update() {
+		historyTable.update();
+		title.update();
+		chartPane.update();
+	}
 
 	
 }

@@ -1,0 +1,5 @@
+.chart {
+    -fx-border-color: black; /* Sets the border color */
+    -fx-border-width: 2px;   /* Sets the border width */
+    -fx-border-style: solid; /* Sets the border style (solid, dashed, etc.) */
+}

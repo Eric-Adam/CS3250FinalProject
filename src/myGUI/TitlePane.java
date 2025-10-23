@@ -1,10 +1,11 @@
 package myGUI;
 
 import budgetTracker.Budget;
-import javafx.geometry.Pos;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.*;
+import javafx.stage.Screen;
 
 public class TitlePane extends AnchorPane{
 	private String status;
@@ -17,34 +18,39 @@ public class TitlePane extends AnchorPane{
     
 	public TitlePane(RunGUI runGUI, Budget budget) {
 		this.budget = budget;
+		Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
 		
 		// Main Title
 		String welcomeMessage = "------ Welcome "+runGUI.getUser()+" ------";
-		Label titleLabel = new Label(welcomeMessage);
-		HBox  titlePane = new HBox (titleLabel);
-		titlePane.setAlignment(Pos.CENTER);
-		titlePane.setPrefWidth(1000.0);
-		setTopAnchor(titlePane, 50.0);
-		this.getChildren().add(titlePane);
+		Label welcomeLabel = new Label(welcomeMessage);
+		HBox  welcomeHBox = new HBox (welcomeLabel);
+		
+		double welcomeLeftAnchor = screenBounds.getWidth() / 2 - 100;
+		double welcomeTopAnchor = screenBounds.getHeight() * 0.05;
+		setLeftAnchor(welcomeHBox, welcomeLeftAnchor);
+		setTopAnchor(welcomeHBox, welcomeTopAnchor);
+		this.getChildren().add(welcomeHBox);
 		
 		// Show remaining budget
 		balance = String.format("%.2f", budget.getOverallBalance());
 		balanceLabel.setText("Remaining Balance:\t$ " + balance); 
-		setTopAnchor(balanceLabel, 100.0);							 
-		setRightAnchor(balanceLabel, 200.0);
+		
+		double sideAnchor = screenBounds.getWidth() * 0.2;
+		setTopAnchor(balanceLabel, welcomeTopAnchor*2);							 
+		setRightAnchor(balanceLabel, sideAnchor);
 		this.getChildren().add(balanceLabel);
 
 		// Show status of the budget
 		status = budget.getBudgetStatus();
 		statusLabel.setText("Status:\t" + status);
-		setTopAnchor(statusLabel, 100.0);
-		setLeftAnchor(statusLabel, 250.0);
+		setTopAnchor(statusLabel, welcomeTopAnchor*2);
+		setLeftAnchor(statusLabel, sideAnchor);
 		this.getChildren().add(statusLabel);
 		
 		// Logout
 		Button logoutButton = new Button("Log Out");
-		setTopAnchor(logoutButton, 25.0);
-		setRightAnchor(logoutButton, 50.0);
+		setTopAnchor(logoutButton, welcomeTopAnchor/2);
+		setRightAnchor(logoutButton, sideAnchor/2);
 		this.getChildren().add(logoutButton);
 		
 		// Listener
