@@ -19,8 +19,8 @@ public class TrackerPage extends BorderPane{
 		double maxChartHeight = screenBounds.getHeight() * 0.4; 
 		
 		double screenWidth = screenBounds.getWidth();
-		double maxInputWidth = screenBounds.getWidth() * 0.4;
-		double maxCharttWidth = screenBounds.getWidth() * 0.6;
+		double maxInputWidth = screenBounds.getWidth() * 0.2;
+		double maxChartWidth = screenBounds.getWidth() * 0.8;
 		
 		// Padding
 		Insets titleInsets = new Insets(25,10,25,10);
@@ -45,9 +45,9 @@ public class TrackerPage extends BorderPane{
 		this.setBottom(historyPane);
 		
 	    // Center: Budget Charts
-		ChartPane chartPane = new ChartPane(budget);
+		ChartPane chartPane = new ChartPane(budget, maxChartWidth);
 		chartPane.setPadding(chartInsets);
-		chartPane.setMaxWidth(maxCharttWidth);
+		chartPane.setMaxWidth(maxChartWidth);
 		chartPane.setMaxHeight(maxChartHeight);
 		this.setCenter(chartPane);     
 		

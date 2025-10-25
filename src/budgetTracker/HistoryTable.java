@@ -15,7 +15,7 @@ public class HistoryTable extends TableView<Transaction>{
 	public HistoryTable(Budget budget) {
 		// Assign Budget object
 		this.budget = budget;
-		this.observableList.setAll(budget.observableList);
+		this.observableList.setAll(budget.transactionList);
 		
 		// Set up TableView		
 		// --- Tableview Columns
@@ -150,7 +150,7 @@ public class HistoryTable extends TableView<Transaction>{
 	
 	public void update() {
 		budget.refreshData();
-		observableList.setAll(budget.observableList);
+		observableList.setAll(budget.transactionList);
 	}
 	
 }

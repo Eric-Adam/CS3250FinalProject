@@ -9,16 +9,16 @@ transactionAmount,category,note,income,date
 64.96,Groceries,State Fair Food,false,2025-09-15
 30.0,Miscellaneous,State Fair,false,2025-09-15
 671.68,Clothing,JCPenny,false,2025-09-17
-101.0,Wife,Transfer,true,2025-09-22
+101.0,Spouse,Transfer,true,2025-09-22
 10.73,Subscriptions,Webnovel,false,2025-09-22
 38.0,Personal Care,Great Clips,false,2025-09-22
 110.0,Phone,Bill,false,2025-09-22
 17.11,Subscriptions,Chegg,false,2025-09-29
 9.99,Subscriptions,Doordash,false,2025-09-30
 10.98,Groceries,Hotdog stuff,false,2025-10-01
-1791.14,Wife,Transfer,false,2025-10-06
+1791.14,Rent,Transfer,false,2025-10-06
 500.0,VA,GI Bill,false,2025-10-09
 10.73,Subscriptions,ShopTitans,false,2025-10-09
 11.81,Subscriptions,Pandora,false,2025-10-09
 1202.0,VA,GI Bill,false,2025-10-11
-200.0,Wife,Car Tow,true,2025-10-12
+200.0,Spouse,Car Tow,true,2025-10-12

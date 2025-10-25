@@ -1,22 +1,12 @@
 package myGUI;
 import java.time.LocalDate;
 
-import budgetTracker.Budget;
-import budgetTracker.HistoryTable;
-import budgetTracker.Transaction;
+import budgetTracker.*;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 
-public class InputPane extends VBox{
-	private static String[] categories = 
-		{"Books","Car","Clothing","Credit Card","Entertainment",
-		 "Events","Gifts","Groceries","Household","Insurance",
-		 "Internet","Loan","Personal Care","Pets","Phone",
-		 "Rent","Retirement","Savings","School","Subscriptions",
-		 "Takeout/Delivery","Travel","Utilities","VA","Wife",
-		 "Miscellaneous"};
-			
+public class InputPane extends VBox{			
 	private HistoryTable historyTable;
 	private ChartPane chartPane;
 	private TitlePane title;
@@ -50,8 +40,8 @@ public class InputPane extends VBox{
 		// --- Category field
 		Label newTransactionLabel = new Label("Category: ");
 		ComboBox<String> transactionCategory = new ComboBox<>();
-		transactionCategory.setValue(categories[25]);
-		transactionCategory.getItems().addAll(categories);
+		transactionCategory.setValue(Budget.categories[25]);
+		transactionCategory.getItems().addAll(Budget.categories);
 		HBox newTransactionBudgetEntry = new HBox();
 		newTransactionBudgetEntry.getChildren().addAll(newTransactionLabel,transactionCategory);
 		this.getChildren().add(newTransactionBudgetEntry);
@@ -126,7 +116,7 @@ public class InputPane extends VBox{
 		addNewTransactionButton.setOnAction(e -> {
 			if (addNewTransactionButton.isSelected()) {
             	// Set to default
-    			transactionCategory.setValue(categories[25]);
+    			transactionCategory.setValue(Budget.categories[25]);
     			newNoteField.setText("");
     			transactionType.setValue(transactionTypes[0]);
     			newTransactionAmountText.setText("0.00");

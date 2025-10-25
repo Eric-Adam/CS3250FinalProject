@@ -3,3 +3,12 @@
     -fx-border-width: 2px;   /* Sets the border width */
     -fx-border-style: solid; /* Sets the border style (solid, dashed, etc.) */
 }
+
+.chart-legend {
+    -fx-font-size: 12px; /* Adjust font size */
+    -fx-padding: 10;     /* Add padding */
+}
+
+.chart-legend-item {
+    -fx-padding: 5;      /* Adjust spacing between items */
+}

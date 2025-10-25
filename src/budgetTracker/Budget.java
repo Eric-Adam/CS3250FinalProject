@@ -13,9 +13,18 @@ public class Budget {
 	private double budgetMax=0;
 	private ArrayList<Transaction> income = new ArrayList<Transaction>();
 	private ArrayList<Transaction> expenses = new ArrayList<Transaction>();
-	private List<Transaction> transactions;
-    public final ObservableList<Transaction> observableList = FXCollections.observableArrayList();
-    private final String filePath;
+	private static List<Transaction> transactions;
+	private final String filePath;
+	
+	public final ObservableList<Transaction> transactionList = FXCollections.observableArrayList();
+    public static final String[] categories = {"Books","Car","Clothing","Credit Card","Entertainment",
+								   		 "Events","Gifts","Groceries","Household","Insurance",
+								   		 "Internet","Loan","Personal Care","Pets","Phone",
+								   		 "Rent","Retirement","Savings","School","Spouse",
+								   		 "Subscriptions","Takeout/Delivery","Travel","Utilities","VA",
+								   		 "Miscellaneous"};
+    
+    
 
 	public Budget(String filePath) {
 		// Load data
@@ -56,6 +65,32 @@ public class Budget {
     	else return 0.0;
     }
     
+    public static double getTotalExpenses() {
+    	double expenses = 0;
+    	double tempAmount =0;
+    	
+    	for (Transaction transaction : transactions) {
+        		tempAmount = transaction.getTransactionAmount();
+        		expenses += (!transaction.isIncome()) ? tempAmount : 0.0;
+    	}
+        
+    	if(expenses > 0) return expenses;
+    	else return 0.0;
+    }
+    
+    public static double getTotalIncome() {
+    	double income = 0;
+    	double tempAmount =0;
+    	
+    	for (Transaction transaction : transactions) {
+        		tempAmount = transaction.getTransactionAmount();
+        		income += (transaction.isIncome()) ? tempAmount : 0.0;
+    	}
+        
+    	if(income > 0) return income;
+    	else return 0.0;
+    }
+    
     public String getBudgetStatus() {
     	String status="";
     	double currentRemaining = getOverallBalance();
@@ -84,7 +119,7 @@ public class Budget {
 		    							Boolean.parseBoolean(row[3]), 
 		    							LocalDate.parse(row[4])))
 		    .collect(Collectors.toList());
-		observableList.setAll(transactions);
+		transactionList.setAll(transactions);
 		
 		// Fill income/expense lists
 		for (Transaction t : transactions) {
@@ -109,7 +144,7 @@ public class Budget {
                 rows.add(values); 
             }
         } catch (Exception e) {
-            System.out.println("Failed to load CSV data:\n"+e);
+            System.out.println("Failed to load CSV data:\n" + e);
         }
         return rows;	
 	}
@@ -119,7 +154,7 @@ public class Budget {
     	transactions.clear();
     	income.clear();
     	expenses.clear();
-    	observableList.clear();
+    	transactionList.clear();
         loadTransactions();
     }
 }
