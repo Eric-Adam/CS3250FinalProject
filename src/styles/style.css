@@ -1,7 +1,7 @@
 .chart {
     -fx-border-color: black; /* Sets the border color */
     -fx-border-width: 2px;   /* Sets the border width */
-    -fx-border-style: solid; /* Sets the border style (solid, dashed, etc.) */
+    -fx-border-style: solid; /* Sets the border style */
 }
 
 .chart-legend {
@@ -10,5 +10,13 @@
 }
 
 .chart-legend-item {
-    -fx-padding: 5;      /* Adjust spacing between items */
+    -fx-padding: 5;      /* Adjust spacing between bars */
+}
+
+.default-color0.chart-bar {
+    -fx-bar-fill: green; /* Green for income */
+}
+
+.default-color1.chart-bar {
+    -fx-bar-fill: orange; /* Orange for expenses */
 }

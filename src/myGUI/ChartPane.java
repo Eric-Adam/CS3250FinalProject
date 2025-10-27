@@ -1,9 +1,9 @@
 package myGUI;
 
 import budgetTracker.*;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.AnchorPane;
 
-public class ChartPane extends StackPane{
+public class ChartPane extends AnchorPane{
 	private BuildCharts charts;
 	private Budget budget;
 	
@@ -11,7 +11,7 @@ public class ChartPane extends StackPane{
 		this.budget = budget;
 		this.charts = new BuildCharts(budget, this,maxChartWidth);
 		this.getChildren().add(charts);	
-		charts.showPieChart();
+		charts.showLineChart();
 	}
 	
 	public void update() {

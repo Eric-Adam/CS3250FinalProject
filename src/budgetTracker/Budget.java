@@ -65,7 +65,7 @@ public class Budget {
     	else return 0.0;
     }
     
-    public static double getTotalExpenses() {
+    public double getTotalExpenses() {
     	double expenses = 0;
     	double tempAmount =0;
     	
@@ -78,7 +78,7 @@ public class Budget {
     	else return 0.0;
     }
     
-    public static double getTotalIncome() {
+    public double getTotalIncome() {
     	double income = 0;
     	double tempAmount =0;
     	

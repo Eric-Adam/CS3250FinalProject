@@ -13,17 +13,24 @@ import javafx.scene.layout.Pane;
 import myGUI.ChartPane;
 
 public class BuildCharts extends Pane{
+	private static final double MIN_IMPACT_PERCENTAGE = 1.5;
+	private static final double CHART_HEIGHT = 300.0;
+	
 	private Budget budget;
 	private ChartPane chartPane;
 	private double maxWidth;
 	
-    private CategoryAxis lineXAxis = new CategoryAxis();
-    private NumberAxis lineYAxis = new NumberAxis();
-	private LineChart<String, Number> lineChart = new LineChart<>(lineXAxis,lineYAxis);
+    private final CategoryAxis lineXAxis = new CategoryAxis();
+    private final NumberAxis lineYAxis = new NumberAxis();
+	private final LineChart<String, Number> lineChart 
+					= new LineChart<>(lineXAxis,lineYAxis);
 	
-	private PieChart pieChart = new PieChart();
+	private final PieChart pieChart = new PieChart();
 	
-	private BarChart barChart;
+	private final CategoryAxis barXAxis = new CategoryAxis();
+    private final NumberAxis barYAxis = new NumberAxis();
+	private final BarChart<String, Number> barChart 
+					= new BarChart<String, Number>(barXAxis, barYAxis);
 
 		
 	public BuildCharts(Budget budget, ChartPane chartPane, double maxWidth) {
@@ -44,15 +51,17 @@ public class BuildCharts extends Pane{
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MM-dd");	
 		LocalDate today = LocalDate.now();
 		LocalDate startDate = today.minusDays(30);
+		
 		String date = "";
 		String lastDate = null;
+		
 		double balance = budget.getEarlierBalance(startDate);
 		double tempAmount = 0;
-        
+		
         // Prepare data
-        XYChart.Series<String, Number> series = new XYChart.Series<>();
+        XYChart.Series<String, Number> lineSeries = new XYChart.Series<>();
         XYChart.Data<String, Number> lastData = null;
-        
+
         for (Transaction transaction : budget.transactionList) {
 			if(transaction.getDate().isAfter(startDate)) {
 				// Format date to MM-dd and keep as string
@@ -62,26 +71,29 @@ public class BuildCharts extends Pane{
 				tempAmount = transaction.getTransactionAmount();
 				balance += (transaction.isIncome())? tempAmount : -tempAmount;
 				
-				// Only add data for last transaction on any single date
+				// Keep only the data for the last transaction on any single date
 				if (lastDate == null || !date.equals(lastDate)) {
-					series.getData().add(new Data<String, Number>(date, balance));
+					lineSeries.getData().add(new Data<String, Number>(date, balance));
 			        lastDate = date;
 			    }
 				else {
-					lastData = series.getData().get(series.getData().size() - 1);
+					lastData = lineSeries.getData().get(lineSeries.getData().size() - 1);
 				    lastData.setYValue(balance);
 				}	
 			}
 		}
-        lineChart.getData().add(series);
+        
+        // Place data in lineChart
+        lineChart.getData().add(lineSeries);
 
         // Add details
         lineXAxis.setLabel("Date (MM-dd)");
         lineYAxis.setLabel("Balance ($)");
         
-        lineChart.setTitle("Transactions for the Last 30-Days");
+        lineChart.setPrefWidth(maxWidth * 0.5);
+        lineChart.setPrefHeight(300.0);
+        lineChart.setTitle("30-Day Review");
         lineChart.setLegendVisible(false);
-        lineChart.setMaxHeight(300.0);
 	}
 
 	public void createPieChart() {
@@ -90,12 +102,11 @@ public class BuildCharts extends Pane{
 		
 		// Create pie chart data and variables	
 		ObservableList<PieChart.Data> pieChartData = FXCollections.observableArrayList();
-		double totalExpense = Budget.getTotalExpenses();
+		int budgetLength = Budget.categories.length-1;
+		double totalExpense = budget.getTotalExpenses();
 		double categoryExpense = 0.0;
-		double runningRatio = 100.0;
-		double ratio = 0.0;
-		int length = Budget.categories.length-1;
-		
+		double runningPercentage = 100.0;
+		double percentage = 0.0;		
 
 		for(String category : Budget.categories) { 
 			categoryExpense = 0;
@@ -106,49 +117,91 @@ public class BuildCharts extends Pane{
 					categoryExpense += transaction.getTransactionAmount();
 			}
 			
-			ratio = 100 * (categoryExpense / totalExpense);
+			percentage = 100 * (categoryExpense / totalExpense);
 			
 			// Add the data to categoryRatio if it makes a large enough impact
-			if (category.equals(Budget.categories[length])) {
-				if (ratio > 1.0){
-					pieChartData.add(new PieChart.Data(category,ratio));
+			if (category.equals(Budget.categories[budgetLength])) {
+				if (percentage > MIN_IMPACT_PERCENTAGE){
+					pieChartData.add(new PieChart.Data(category,percentage));
 				}
-				else {
-					pieChartData.add(new PieChart.Data("Other",runningRatio));
-				}
+				pieChartData.add(new PieChart.Data("Other",runningPercentage));
 			}
-			else if (ratio>1.0) {
-				pieChartData.add(new PieChart.Data(category,ratio));
-				runningRatio -= ratio;
+			else if (percentage > MIN_IMPACT_PERCENTAGE) {
+				pieChartData.add(new PieChart.Data(category,percentage));
+				runningPercentage -= percentage;
 			}
 		}
 		
-		// Add details	
-		pieChart.setPrefWidth(maxWidth - 100.0);
-		chartPane.setPrefWidth(maxWidth);
-		pieChart.setPrefHeight(320.0);
-		
+		// Add details		
+        pieChart.setPrefWidth(maxWidth - 100.0);
+        pieChart.setPrefHeight(300.0);
+        
 		pieChart.setTitle("Expenses by Category");  
 		pieChart.setLegendSide(Side.RIGHT);
 		pieChart.getData().addAll(pieChartData); 
 	}
 	
 	public void createBarChart() {
-		// TODO: create Bart chart
+		// Start fresh
+		barChart.getData().clear();
 		
-	}
+		// Create variables
+		XYChart.Series<String, Number> barSeriesExpenses = new XYChart.Series<>();
+		XYChart.Series<String, Number> barSeriesIncome = new XYChart.Series<>();
+		
+		double totalExpenses = budget.getTotalExpenses();
+		double totalIncome = budget.getTotalIncome();
+		
+		// Prepare data for for bar chart
+		XYChart.Data<String, Number> expenseData = new XYChart.Data<String, Number>("Expense", totalExpenses);
+		XYChart.Data<String, Number> incomeData = new XYChart.Data<String, Number>("Income", totalIncome);
+		
+		barSeriesExpenses.getData().add(expenseData);
+		barSeriesIncome.getData().add(incomeData);
+
+		// Place data in bar chart
+		barChart.getData().add(barSeriesIncome);
+		barChart.getData().add(barSeriesExpenses);
+		
+		// Add details
+		barChart.legendVisibleProperty().set(false);
+		barChart.setTitle("Income vs. Expenses");
+		
+		barChart.setPrefWidth(maxWidth * 0.25);
+		barChart.setCategoryGap(50.0);
+		}
 	
 	// Swap which chart is displayed
 	public void showLineChart() {
 		this.getChildren().clear();
-		this.getChildren().add(lineChart);			
+		this.getChildren().add(lineChart);	
+		
+		// Adjust size to better fit chart
+        ChartPane.setLeftAnchor(this, maxWidth*0.2);
+        chartPane.setPrefWidth(maxWidth*0.5);
+        lineChart.setPrefHeight(CHART_HEIGHT); 
+        lineChart.setMaxHeight(CHART_HEIGHT);
 	}
+	
 	public void showPieChart() {
 		this.getChildren().clear();
-		this.getChildren().add(pieChart);			
+		this.getChildren().add(pieChart);
+		
+		// Adjust size to better fit chart
+        ChartPane.setLeftAnchor(this, 1.0);
+		chartPane.setPrefWidth(maxWidth);
+		pieChart.setPrefHeight(CHART_HEIGHT); 
+		pieChart.setMaxHeight(CHART_HEIGHT);
 	}
+	
 	public void showBarChart() {
 		this.getChildren().clear();
-		this.getChildren().add(barChart);			
+		this.getChildren().add(barChart);	
+		
+		// Adjust size to better fit chart
+        ChartPane.setLeftAnchor(this, maxWidth*0.2);
+        chartPane.setPrefWidth(maxWidth*0.5); 
+		barChart.setPrefHeight(CHART_HEIGHT); 
+		barChart.setMaxHeight(CHART_HEIGHT);
 	}
 }
