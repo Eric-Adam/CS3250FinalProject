@@ -20,7 +20,7 @@ public class Budget {
     public static final String[] categories = {"Books","Car","Clothing","Credit Card","Entertainment",
 								   		 "Events","Gifts","Groceries","Household","Insurance",
 								   		 "Internet","Loan","Personal Care","Pets","Phone",
-								   		 "Rent","Retirement","Savings","School","Spouse",
+								   		 "Rent","Retirement","Salary", "Savings","School","Spouse",
 								   		 "Subscriptions","Takeout/Delivery","Travel","Utilities","VA",
 								   		 "Miscellaneous"};
     

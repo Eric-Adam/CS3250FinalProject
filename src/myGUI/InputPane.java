@@ -1,10 +1,19 @@
 package myGUI;
+import java.io.File;
 import java.time.LocalDate;
 
+import javax.imageio.ImageIO;
+import javax.swing.JOptionPane;
+
 import budgetTracker.*;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.Node;
+import javafx.scene.chart.Chart;
 import javafx.scene.control.*;
+import javafx.scene.image.WritableImage;
 import javafx.scene.layout.*;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 
 public class InputPane extends VBox{			
 	private HistoryTable historyTable;
@@ -40,7 +49,7 @@ public class InputPane extends VBox{
 		// --- Category field
 		Label newTransactionLabel = new Label("Category: ");
 		ComboBox<String> transactionCategory = new ComboBox<>();
-		transactionCategory.setValue(Budget.categories[25]);
+		transactionCategory.setValue(Budget.categories[Budget.categories.length-1]);
 		transactionCategory.getItems().addAll(Budget.categories);
 		HBox newTransactionBudgetEntry = new HBox();
 		newTransactionBudgetEntry.getChildren().addAll(newTransactionLabel,transactionCategory);
@@ -89,8 +98,8 @@ public class InputPane extends VBox{
 				newTransactionDate,submitCancelTransaction,newTransactionTypeEntry);
 		
 		
-		// TODO:--- --- Edit transaction buttons
-		// TODO:--- --- Delete transaction buttons
+		// TODO:--- --- Edit transaction section/function
+		// TODO:--- --- Delete transaction section/function
 				
 				
 		// -----------------------------------Chart Control Section -------------------------------
@@ -112,11 +121,11 @@ public class InputPane extends VBox{
 		
 		// ----------------------------------- Listener Section -----------------------------------		
 		// Transaction Listeners		
-		// --- Add New Transaction - Displays buttons related to adding transactions
-		addNewTransactionButton.setOnAction(e -> {
+		// --- Add New Transaction: Displays buttons related to adding transactions
+		addNewTransactionButton.setOnAction(event -> {
 			if (addNewTransactionButton.isSelected()) {
             	// Set to default
-    			transactionCategory.setValue(Budget.categories[25]);
+    			transactionCategory.setValue(Budget.categories[Budget.categories.length-1]);
     			newNoteField.setText("");
     			transactionType.setValue(transactionTypes[0]);
     			newTransactionAmountText.setText("0.00");
@@ -141,15 +150,15 @@ public class InputPane extends VBox{
 			});
         });
 		
-		// --- --- Transaction amount entry - forces entry to be valid
+		// --- --- Transaction amount entry: forces entry to be valid
 		newTransactionAmountText.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.matches("\\d*(\\.\\d{0,2})?")) {
             	newTransactionAmountText.setText(oldValue);
             }
         });
 		
-		// --- --- Submit Transaction - pulls data from fields and creates a new transaction
-		submitTransactionButton.setOnAction(e->{
+		// --- --- Submit Transaction: pulls data from fields and saves to them to CSV
+		submitTransactionButton.setOnAction(event -> {
 			String file = budget.getFilePath();
 			double amountEntry = Double.parseDouble(newTransactionAmountText.getText());
 			String categoryEntry = transactionCategory.getValue();
@@ -174,8 +183,8 @@ public class InputPane extends VBox{
 			
 		});
 		
-		// --- --- Cancel Transaction - Resets defaults and closes new transaction
-		cancelNewTransactionButton.setOnAction(e -> {	
+		// --- --- Cancel Transaction: Resets addNewTransactionButton and closes new transaction section
+		cancelNewTransactionButton.setOnAction(event -> {	
 			addNewTransactionButton.setSelected(false);
 
 			makeInvisible(newTransactionBudgetEntry,newTransactionAmountEntry,noteHbox,
@@ -187,33 +196,59 @@ public class InputPane extends VBox{
 		
 		
 		// Chart Listeners		
-		// --- Select Chart listener - changes which chart is displayed
-		// TODO: Select Chart listener; need charts
-		
-		// --- Save chart listener - Captures currently selected chart 
-		saveChartButton.setOnAction(e -> {
-			String[] fileNames = {"30DayLinear.jpg", "CategoryPie.jpg", "inVsOutBar.jpg"};
-			String chartFileName;
-			String chartNameCapture = chartTypeComboBox.getValue();
-			if(chartNameCapture.equalsIgnoreCase("30-Day Transactions"))
-				chartFileName = fileNames[0];
-			else if (chartNameCapture.equalsIgnoreCase("Category"))
-				chartFileName = fileNames[1];
-			else 
-				chartFileName = fileNames[2];
+		// --- Select chart listener: Changes which chart is displayed
+		chartTypeComboBox.setOnAction(event -> {
+			String selectedChart = chartTypeComboBox.getValue();
 			
-			saveChart(chartFileName);
+			if(selectedChart.equals(chartTypes[0]))
+				chartPane.charts.showLineChart();
+			else if(selectedChart.equals(chartTypes[1]))
+				chartPane.charts.showPieChart();
+			else
+				chartPane.charts.showBarChart();
+		});
+		
+		// --- Save chart listener: Captures currently selected chart 
+		saveChartButton.setOnAction(event -> {
+			String[] fileNames = {"30DayTransactionOverview", "ExpenseReviewByCategory", "IncomeVsExpenses"};
+			String chartNameCapture = chartTypeComboBox.getValue();
+			
+			if(chartNameCapture.equals(chartTypes[0]))
+				saveChart(fileNames[0], chartPane.charts.lineChart);
+			else if (chartNameCapture.equals(chartTypes[1]))
+				saveChart(fileNames[1], chartPane.charts.pieChart);
+			else 
+				saveChart(fileNames[2], chartPane.charts.barChart);
         });
 	
 	}
 	
-	// TODO: Save Chart
-	private void saveChart(String fileName) {
+	// Save chart to user specified location and name
+	private void saveChart(String fileName, Chart chart) {
+		WritableImage image = chart.snapshot(null, null);
+
+		FileChooser fileChooser = new FileChooser();
 		
+        fileChooser.setTitle("Save File");
+        fileChooser.setInitialFileName(fileName);
+        fileChooser.setInitialDirectory(new File(System.getProperty("user.home"), "Desktop"));
+        fileChooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("PNG Image", "*.png")
+            );
+
+        Stage stage = (Stage) chart.getScene().getWindow();
+        File file = fileChooser.showSaveDialog(stage);
 		
+		try {
+            ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);
+        } 
+		catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Failed to save chart", "Save Failure", JOptionPane.ERROR_MESSAGE);
+            e.printStackTrace();
+        }
 	}
 	
-	// Makes buttons invisible and visible
+	// Make sections invisible and visible
 	public void makeInvisible(Node n1,Node n2,Node n3,Node n4,Node n5,Node n6) {
 		n1.setVisible(false); n1.setManaged(false);
 		n2.setVisible(false); n2.setManaged(false);

@@ -22,14 +22,14 @@ public class BuildCharts extends Pane{
 	
     private final CategoryAxis lineXAxis = new CategoryAxis();
     private final NumberAxis lineYAxis = new NumberAxis();
-	private final LineChart<String, Number> lineChart 
+	public final LineChart<String, Number> lineChart 
 					= new LineChart<>(lineXAxis,lineYAxis);
 	
-	private final PieChart pieChart = new PieChart();
+	public final PieChart pieChart = new PieChart();
 	
 	private final CategoryAxis barXAxis = new CategoryAxis();
     private final NumberAxis barYAxis = new NumberAxis();
-	private final BarChart<String, Number> barChart 
+	public final BarChart<String, Number> barChart 
 					= new BarChart<String, Number>(barXAxis, barYAxis);
 
 		
@@ -91,7 +91,7 @@ public class BuildCharts extends Pane{
         lineYAxis.setLabel("Balance ($)");
         
         lineChart.setPrefWidth(maxWidth * 0.5);
-        lineChart.setPrefHeight(300.0);
+        lineChart.setPrefHeight(CHART_HEIGHT);
         lineChart.setTitle("30-Day Review");
         lineChart.setLegendVisible(false);
 	}
@@ -133,8 +133,8 @@ public class BuildCharts extends Pane{
 		}
 		
 		// Add details		
-        pieChart.setPrefWidth(maxWidth - 100.0);
-        pieChart.setPrefHeight(300.0);
+        pieChart.setPrefWidth(maxWidth * 0.8);
+        pieChart.setPrefHeight(CHART_HEIGHT);
         
 		pieChart.setTitle("Expenses by Category");  
 		pieChart.setLegendSide(Side.RIGHT);
@@ -180,7 +180,6 @@ public class BuildCharts extends Pane{
         ChartPane.setLeftAnchor(this, maxWidth*0.2);
         chartPane.setPrefWidth(maxWidth*0.5);
         lineChart.setPrefHeight(CHART_HEIGHT); 
-        lineChart.setMaxHeight(CHART_HEIGHT);
 	}
 	
 	public void showPieChart() {
@@ -191,7 +190,6 @@ public class BuildCharts extends Pane{
         ChartPane.setLeftAnchor(this, 1.0);
 		chartPane.setPrefWidth(maxWidth);
 		pieChart.setPrefHeight(CHART_HEIGHT); 
-		pieChart.setMaxHeight(CHART_HEIGHT);
 	}
 	
 	public void showBarChart() {
@@ -202,6 +200,5 @@ public class BuildCharts extends Pane{
         ChartPane.setLeftAnchor(this, maxWidth*0.2);
         chartPane.setPrefWidth(maxWidth*0.5); 
 		barChart.setPrefHeight(CHART_HEIGHT); 
-		barChart.setMaxHeight(CHART_HEIGHT);
 	}
 }

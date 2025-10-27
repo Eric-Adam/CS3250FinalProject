@@ -1,22 +1,27 @@
+/* Set border around charts */
 .chart {
-    -fx-border-color: black; /* Sets the border color */
-    -fx-border-width: 2px;   /* Sets the border width */
-    -fx-border-style: solid; /* Sets the border style */
+    -fx-border-color: black; 
+    -fx-border-width: 2px;   
+    -fx-border-style: solid; 
 }
 
+/* Adjust legend so everything fits */
 .chart-legend {
-    -fx-font-size: 12px; /* Adjust font size */
-    -fx-padding: 10;     /* Add padding */
+    -fx-font-size: 12px; 
+    -fx-padding: 10;     
 }
 
+/* Adjust spacing between bars */
 .chart-legend-item {
-    -fx-padding: 5;      /* Adjust spacing between bars */
+    -fx-padding: 5;      
 }
 
+/* Green for income */
 .default-color0.chart-bar {
-    -fx-bar-fill: green; /* Green for income */
+    -fx-bar-fill: green; 
 }
 
+/* Orange for expenses */
 .default-color1.chart-bar {
-    -fx-bar-fill: orange; /* Orange for expenses */
+    -fx-bar-fill: orange; 
 }
