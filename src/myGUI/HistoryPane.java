@@ -9,6 +9,8 @@ import javafx.stage.Screen;
 
 public class HistoryPane extends VBox{
 	private final HistoryTable historyTable;
+	private ChartPane chartPane;
+	private TitlePane title;
 	
 	public HistoryPane(Budget budget) {
 		// Section Title
@@ -29,4 +31,7 @@ public class HistoryPane extends VBox{
 	public HistoryTable getHistoryTable() {
 		return historyTable;
 	}
+	
+	public void setChart(ChartPane chartPane) { historyTable.setChart(chartPane); }
+	public void setTitle(TitlePane title) { historyTable.setTitle(title); }	
 }

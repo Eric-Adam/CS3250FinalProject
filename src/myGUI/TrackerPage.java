@@ -15,7 +15,7 @@ public class TrackerPage extends BorderPane{
 		// Get screen sizes to set max limits for each Pane
 		Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
 		double maxTitleHeight = screenBounds.getHeight() * 0.2;
-		double maxHistoryHeight = screenBounds.getHeight() * 0.4;
+		double maxHistoryHeight = screenBounds.getHeight() * 0.35;
 		double maxChartHeight = screenBounds.getHeight() * 0.4; 
 		
 		double screenWidth = screenBounds.getWidth();
@@ -36,20 +36,23 @@ public class TrackerPage extends BorderPane{
 		titlePane.setMaxHeight(maxTitleHeight);
 		this.setTop(titlePane);
 		
-	    // Bottom: Line-by-line history
-		HistoryPane historyPane = new HistoryPane(budget);
-		historyPane.setPadding(historyInsets);		
-		historyPane.setMaxWidth(screenWidth);
-		historyPane.setMaxHeight(maxHistoryHeight);
-		historyPane.setPrefHeight(maxHistoryHeight);
-		this.setBottom(historyPane);
-		
 	    // Center: Budget Charts
 		ChartPane chartPane = new ChartPane(budget, maxChartWidth);
 		chartPane.setPadding(chartInsets);
 		chartPane.setMaxWidth(maxChartWidth);
 		chartPane.setMaxHeight(maxChartHeight);
 		this.setCenter(chartPane);     
+		
+	    // Bottom: Line-by-line history
+		HistoryPane historyPane = new HistoryPane(budget);
+		historyPane.setPadding(historyInsets);		
+		historyPane.setMaxWidth(screenWidth);
+		historyPane.setMaxHeight(maxHistoryHeight);
+		historyPane.setPrefHeight(maxHistoryHeight);
+		
+		historyPane.setTitle(titlePane);
+		historyPane.setChart(chartPane);
+		this.setBottom(historyPane);
 		
 		// Left: Filled with UI Stuff (i.e. buttons, input fields)
 		InputPane inputPane = new InputPane(budget); 

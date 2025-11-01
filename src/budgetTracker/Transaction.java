@@ -81,7 +81,7 @@ public class Transaction{
 		    writer.append("\n");
 		    
 		} catch (IOException e) {
-			System.out.println("Failed to write to file");
+			System.out.println("Failed to write transaction to file");
 		}
 	}
     

@@ -140,19 +140,27 @@ public class UserCoverPage extends AnchorPane{
 			}
 		});
 		
-		// TODO--- Submit Button in New User Section 
+		// --- Submit Button in New User Section 
 		submitUserButton.setOnAction(e->{
 			// Ensure fields aren't empty
 			Boolean fNameFilled = !fNameField.getText().equals("");
 			Boolean lNameFilled = !lNameField.getText().equals("");
 			Boolean initalAmountFilled = !initialValueField.equals("");
+			Boolean existingUser = false;
+			
+			String firstName = fNameField.getText().trim();
+			String lastName = lNameField.getText().trim();
+			String newUserName = (fNameFilled && lNameFilled)? firstName+" "+lastName: null;
+			
+			for (String user : usernames) {
+				if (newUserName.equals(user))
+					existingUser = true;
+			}
 
-			if (fNameFilled && lNameFilled && initalAmountFilled) {
+			if (fNameFilled && lNameFilled && initalAmountFilled && !existingUser) {
 				Double initialAmount = Double.parseDouble(initialValueField.getText());
-				String firstName = fNameField.getText();
-				String lastName = lNameField.getText();
-				runGUI.setUser(firstName+" "+lastName);
 				createNewUser(initialAmount, firstName, lastName);
+				runGUI.setUser(newUserName);
 			}
 			
 			initialValueField.setText("0.00");
@@ -215,7 +223,7 @@ public class UserCoverPage extends AnchorPane{
 		    writer.append("\n");
 		    
 		} catch (IOException e) {
-			System.out.println("Failed to write to " + file.toString());
+			System.out.println("Failed to create file " + file.toString());
 		}
 	}
 	    

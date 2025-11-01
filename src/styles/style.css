@@ -5,23 +5,37 @@
     -fx-border-style: solid; 
 }
 
-/* Adjust legend so everything fits */
+/* Adjust legend so everything fits in pie chart*/
 .chart-legend {
     -fx-font-size: 12px; 
     -fx-padding: 10;     
 }
 
-/* Adjust spacing between bars */
+/* Adjust spacing between bars in bar chart*/
 .chart-legend-item {
     -fx-padding: 5;      
 }
 
-/* Green for income */
+/* Chart income color */
 .default-color0.chart-bar {
     -fx-bar-fill: green; 
 }
 
-/* Orange for expenses */
+/* Chart expense color */
 .default-color1.chart-bar {
     -fx-bar-fill: orange; 
 }
+
+/* Disabled dates don't look greyed out */
+.date-picker:disabled {
+    -fx-opacity: 1;       
+    -fx-background-color: white;
+    -fx-text-fill: black;
+}
+
+
+
+
+
+
+

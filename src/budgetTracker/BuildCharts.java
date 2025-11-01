@@ -62,7 +62,7 @@ public class BuildCharts extends Pane{
         XYChart.Series<String, Number> lineSeries = new XYChart.Series<>();
         XYChart.Data<String, Number> lastData = null;
 
-        for (Transaction transaction : budget.transactionList) {
+        for (Transaction transaction : budget.transactions) {
 			if(transaction.getDate().isAfter(startDate)) {
 				// Format date to MM-dd and keep as string
 				date = transaction.getDate().format(formatter).toString();
@@ -70,6 +70,9 @@ public class BuildCharts extends Pane{
 				// Adjust the balance to reflect what it was on that date
 				tempAmount = transaction.getTransactionAmount();
 				balance += (transaction.isIncome())? tempAmount : -tempAmount;
+				
+				if (balance < 0.0)
+					balance = 0.0;
 				
 				// Keep only the data for the last transaction on any single date
 				if (lastDate == null || !date.equals(lastDate)) {
@@ -112,7 +115,7 @@ public class BuildCharts extends Pane{
 			categoryExpense = 0;
 			
 			//  Keep running amount of expenses for each category
-			for(Transaction transaction : budget.transactionList) {
+			for(Transaction transaction : budget.transactions) {
 				if (transaction.getCategory().equals(category) && !transaction.isIncome()) 
 					categoryExpense += transaction.getTransactionAmount();
 			}

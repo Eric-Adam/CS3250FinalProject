@@ -98,10 +98,6 @@ public class InputPane extends VBox{
 				newTransactionDate,submitCancelTransaction,newTransactionTypeEntry);
 		
 		
-		// TODO:--- --- Edit transaction section/function
-		// TODO:--- --- Delete transaction section/function
-				
-				
 		// -----------------------------------Chart Control Section -------------------------------
 		// Chart control buttons
 		Label chartLabel = new Label("Charts and Graphs:");
@@ -115,9 +111,7 @@ public class InputPane extends VBox{
 		HBox chartTypeHbox = new HBox(5);
 		chartTypeHbox.getChildren().addAll(chartTypeComboBox,saveChartButton);
 		this.getChildren().add(chartTypeHbox);
-		
-		
-		
+
 		
 		// ----------------------------------- Listener Section -----------------------------------		
 		// Transaction Listeners		
@@ -131,10 +125,15 @@ public class InputPane extends VBox{
     			newTransactionAmountText.setText("0.00");
     			newTransactionDateEntry.setValue(LocalDate.now());
     			
+    			// Make section visible
 				makeVisible(newTransactionBudgetEntry,newTransactionAmountEntry,noteHbox,
-						newTransactionDate,submitCancelTransaction,newTransactionTypeEntry);
- 			
+						newTransactionDate,submitCancelTransaction,newTransactionTypeEntry); 
+				
+				// Close out other sections
+				editTransactionButton.setSelected(false);
+				deleteTransactionButton.setSelected(false);
             } else {
+            	// Close section
             	makeInvisible(newTransactionBudgetEntry,newTransactionAmountEntry,noteHbox,
 						newTransactionDate,submitCancelTransaction,newTransactionTypeEntry);
             }
@@ -191,8 +190,29 @@ public class InputPane extends VBox{
 					newTransactionDate,submitCancelTransaction,newTransactionTypeEntry);
         });		
 		
-		// --- TODO: Edit transaction listeners
+		// --- Edit transaction listeners
+		// historyTable.getColumns().add/remove(historyTable.incomeColumn);
+		editTransactionButton.setOnAction(event->{
+			// Close other sections
+			if(addNewTransactionButton.isSelected()) {
+				makeInvisible(newTransactionBudgetEntry,newTransactionAmountEntry,noteHbox,
+						newTransactionDate,submitCancelTransaction,newTransactionTypeEntry);
+				addNewTransactionButton.setSelected(false);
+				deleteTransactionButton.setSelected(false);
+			}
+			if (editTransactionButton.isSelected()) {
+				historyTable.setEditable(true);
+				historyTable.getColumns().add(historyTable.incomeColumn);
+			}
+			else {
+				historyTable.setEditable(false);
+				historyTable.getColumns().remove(historyTable.incomeColumn);
+			}
+		});
+		
+
 		// --- TODO: Delete transaction listeners
+
 		
 		
 		// Chart Listeners		
@@ -200,12 +220,22 @@ public class InputPane extends VBox{
 		chartTypeComboBox.setOnAction(event -> {
 			String selectedChart = chartTypeComboBox.getValue();
 			
+			editTransactionButton.setSelected(false);
+			deleteTransactionButton.setSelected(false);
+
 			if(selectedChart.equals(chartTypes[0]))
 				chartPane.charts.showLineChart();
 			else if(selectedChart.equals(chartTypes[1]))
 				chartPane.charts.showPieChart();
 			else
 				chartPane.charts.showBarChart();
+			
+			if(addNewTransactionButton.isSelected()) {
+				addNewTransactionButton.setSelected(false);
+				makeInvisible(newTransactionBudgetEntry,newTransactionAmountEntry,noteHbox,
+						newTransactionDate,submitCancelTransaction,newTransactionTypeEntry);
+			}
+			
 		});
 		
 		// --- Save chart listener: Captures currently selected chart 
@@ -247,6 +277,9 @@ public class InputPane extends VBox{
             e.printStackTrace();
         }
 	}
+	
+	// TODO:--- --- Delete transaction section/function
+	
 	
 	// Make sections invisible and visible
 	public void makeInvisible(Node n1,Node n2,Node n3,Node n4,Node n5,Node n6) {
