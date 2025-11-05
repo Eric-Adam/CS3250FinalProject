@@ -43,8 +43,9 @@ Brown  #f16357
 	-fx-background-color: #cbc3dc;
 }
 
-Button, ToggleButton {
-	
+ToggleButton {
+	-fx-color: #492365;
+	-fx-padding: 40px; 
 }
 
 

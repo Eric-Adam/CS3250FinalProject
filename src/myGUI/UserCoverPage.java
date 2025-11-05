@@ -13,6 +13,11 @@ import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
 public class UserCoverPage extends AnchorPane{
+	private final double WINDOW_WIDTH_START = 200.0;
+	private final double WINDOW_HEIGHT_START = 325.0;
+	private final double WINDOW_WIDTH_START = 200.0;
+	private final double WINDOW_WIDTH_START = 200.0;
+	
 	private String userFile = "src/resources/userData.csv";
 	private ArrayList<String> usernames = new ArrayList<String>();
 	private ArrayList<String> filePaths = new ArrayList<String>();
@@ -71,8 +76,8 @@ public class UserCoverPage extends AnchorPane{
 		VBox centerVBox = new VBox(5);
 		centerVBox.getChildren().addAll(loginVbox, selectUserVbox, fNameHbox, 
 				lNameHbox, initialValueHbox, submitUserButton);
-		setTopAnchor(centerVBox, 75.0);
-		setLeftAnchor(centerVBox, 100.0);
+		setTopAnchor(centerVBox, 10.0);
+		setLeftAnchor(centerVBox, 15.0);
 		this.getChildren().addAll(centerVBox);
 		
 		disableLogin(true);
