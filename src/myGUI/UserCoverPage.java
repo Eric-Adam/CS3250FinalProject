@@ -8,7 +8,6 @@ import java.util.List;
 
 import budgetTracker.NewUser;
 import budgetTracker.Transaction;
-import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
@@ -20,7 +19,16 @@ public class UserCoverPage extends AnchorPane{
 	private Stage primaryStage;
 	private RunGUI runGUI;
 	
+	private ToggleButton loginButton;
+	private ToggleButton newUserButton;
 	
+	private HBox selectUserVbox;
+	
+	private HBox fNameHbox;
+	private HBox lNameHbox;
+	private HBox initialValueHbox;
+	private Button submitUserButton;
+
 	public UserCoverPage(Stage primaryStage, RunGUI runGUI) {
 		// Load UserData
 		loadUserData();	
@@ -28,8 +36,8 @@ public class UserCoverPage extends AnchorPane{
 		this.runGUI = runGUI;
 		
 		// Login Section
-		ToggleButton loginButton = new ToggleButton("Login");
-		ToggleButton newUserButton = new ToggleButton("New User");
+		loginButton = new ToggleButton("Login");
+		newUserButton = new ToggleButton("New User");
 		HBox loginVbox = new HBox(5);
 		loginVbox.getChildren().addAll(loginButton, newUserButton);
 		
@@ -38,26 +46,26 @@ public class UserCoverPage extends AnchorPane{
 		selectUserCombo.getItems().addAll(usernames);
         selectUserCombo.setPromptText("Username");			
 		Button enterButton = new Button("Enter");
-		HBox selectUserVbox = new HBox(5);
+		selectUserVbox = new HBox(5);
 		selectUserVbox.getChildren().addAll(selectUserCombo, enterButton);
 		
 		// New User Section
-		Label fNameLabel = new Label("First Name: ");
+		Label fNameLabel = new Label("First Name:     ");
 		TextField fNameField = new TextField("");
-		HBox fNameHbox = new HBox(5);
+		fNameHbox = new HBox(5);
 		fNameHbox.getChildren().addAll(fNameLabel, fNameField);
 		
-		Label lNameLabel = new Label("Last Name: ");
+		Label lNameLabel = new Label("Last Name:      ");
 		TextField lNameField = new TextField("");
-		HBox lNameHbox = new HBox(5);
+		lNameHbox = new HBox(5);
 		lNameHbox.getChildren().addAll(lNameLabel, lNameField);
 		
 		Label initialValueLabel = new Label("Intitial Value: $");
 		TextField initialValueField = new TextField("0.00");
-		HBox initialValueHbox = new HBox(5);
+		initialValueHbox = new HBox(5);
 		initialValueHbox.getChildren().addAll(initialValueLabel, initialValueField);
 		
-		Button submitUserButton = new Button("Submit");
+		submitUserButton = new Button("Submit");
 		
 		// Put it all together
 		VBox centerVBox = new VBox(5);
@@ -67,9 +75,8 @@ public class UserCoverPage extends AnchorPane{
 		setLeftAnchor(centerVBox, 100.0);
 		this.getChildren().addAll(centerVBox);
 		
-		makeInvisible(selectUserVbox);
-		makeInvisible(fNameHbox, lNameHbox, 
-				initialValueHbox, submitUserButton);
+		disableLogin(true);
+		disableNewUser(true);
 
 		
 		// Listener Section
@@ -77,13 +84,10 @@ public class UserCoverPage extends AnchorPane{
 		loginButton.setOnAction(e->{
 			if (loginButton.isSelected()) {
 				// Ensure new user is closed
-				makeInvisible(fNameHbox, lNameHbox, 
-						initialValueHbox, submitUserButton);
-				newUserButton.setSelected(false);
+				disableNewUser(true);
 				
 				// Open login 
-				makeVisible(selectUserVbox);
-				resizeWindow(200, 500);
+				disableLogin(false);
 				
 				// Set default values
 				loadUserData();
@@ -102,16 +106,14 @@ public class UserCoverPage extends AnchorPane{
 		        }
 			else {
 				// Close login
-				makeInvisible(selectUserVbox);
-				resizeWindow(200, 350);
+				disableLogin(true);
 			}
 		});
 		
 		// --- Enter Button in Login Section
 		enterButton.setOnAction(e->{
 			String selectedUser = selectUserCombo.getValue();
-			makeInvisible(selectUserVbox);
-			loginButton.setSelected(false);
+			disableLogin(true);
 			
 			if (!selectedUser.equals("Username")) {
 				String filePath = filePaths.get(usernames.indexOf(selectedUser));
@@ -123,20 +125,20 @@ public class UserCoverPage extends AnchorPane{
 		// --- New User Button
 		newUserButton.setOnAction(e ->{
 			if (newUserButton.isSelected()) {
-				// Ensure login is closed
-				makeVisible(fNameHbox, lNameHbox, 
-						initialValueHbox, submitUserButton);
-				loginButton.setSelected(false);
+				// Ensure login section is closed
+				disableLogin(true);
 				
 				// Open new user
-				makeInvisible(selectUserVbox);
-				resizeWindow(350, 400);
+				disableNewUser(false);
+				
+				// Set defaults
+				initialValueField.setText("0.00");
+				fNameField.setText("");
+				lNameField.setText("");
 			}
 			else {
-				// Close login
-				makeInvisible(fNameHbox, lNameHbox, 
-						initialValueHbox, submitUserButton);
-				resizeWindow(200, 350);
+				// Close new user
+				disableNewUser(true);
 			}
 		});
 		
@@ -159,16 +161,9 @@ public class UserCoverPage extends AnchorPane{
 
 			if (fNameFilled && lNameFilled && initalAmountFilled && !existingUser) {
 				Double initialAmount = Double.parseDouble(initialValueField.getText());
+				disableNewUser(true);
 				createNewUser(initialAmount, firstName, lastName);
-				runGUI.setUser(newUserName);
-			}
-			
-			initialValueField.setText("0.00");
-			fNameField.setText("");
-			lNameField.setText("");
-			
-			makeInvisible(fNameHbox, lNameHbox, initialValueHbox, submitUserButton);
-			newUserButton.setSelected(false);
+			}	
 		});
 		
 		// --- Force Initial Value to be valid
@@ -177,8 +172,6 @@ public class UserCoverPage extends AnchorPane{
 	        	initialValueField.setText(oldValue);
 	        }
 		});
-		
-		
 	}
 	
 	// Creates new user
@@ -207,6 +200,7 @@ public class UserCoverPage extends AnchorPane{
 		saveToCSV(userDataFile, newUserData);
 		Transaction.saveToCSV(userDataFile.toString(), initialTransaction);
 		
+		runGUI.setUser(addUser.getFirst());
 		runGUI.switchToTracker(userDataFile.toString());
 	}
 	
@@ -261,25 +255,40 @@ public class UserCoverPage extends AnchorPane{
 	}
 	
 	
-	// Make sections appear and disappear
-	private void makeVisible(Node n1) {
-		n1.setVisible(true); n1.setManaged(true);
-	}
-	private void makeVisible(Node n1, Node n2, Node n3, Node n4) {
-		n1.setVisible(true); n1.setManaged(true);
-		n2.setVisible(true); n2.setManaged(true);
-		n3.setVisible(true); n3.setManaged(true);
-		n4.setVisible(true); n4.setManaged(true);
+	// Make sections appear and disappear	
+	private void disableNewUser(boolean disable) {
+		boolean enable = !disable;
+		
+		newUserButton.setSelected(enable);
+		
+		fNameHbox.setVisible(enable); 
+		lNameHbox.setVisible(enable); 
+		initialValueHbox.setVisible(enable); 
+		submitUserButton.setVisible(enable); 
+		
+		fNameHbox.setManaged(enable);
+		lNameHbox.setManaged(enable);
+		initialValueHbox.setManaged(enable);
+		submitUserButton.setManaged(enable);
+		
+		if (enable)
+			resizeWindow(350, 400);
+		else
+			resizeWindow(200, 350);		
 	}
 	
-	private void makeInvisible(Node n1) {
-		n1.setVisible(false); n1.setManaged(false);
-	}
-	private void makeInvisible(Node n1, Node n2, Node n3, Node n4) {
-		n1.setVisible(false); n1.setManaged(false);
-		n2.setVisible(false); n2.setManaged(false);
-		n3.setVisible(false); n3.setManaged(false);
-		n4.setVisible(false); n4.setManaged(false);
+	private void disableLogin(boolean disable) {
+		boolean enable = !disable;
+
+		loginButton.setSelected(enable);
+		
+		selectUserVbox.setVisible(enable); 
+		selectUserVbox.setManaged(enable);
+		
+		if (enable)
+			resizeWindow(200, 375);
+		else
+			resizeWindow(200, 350);
 	}
 	
 	// Change window size to fit appearing/disappearing nodes

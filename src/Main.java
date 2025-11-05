@@ -18,16 +18,14 @@ public class Main extends Application{
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		String stylesheet = getClass().getResource("styles/style.css").toExternalForm();
+		RunGUI root = new RunGUI(primaryStage);
+		root.getStyleClass().add("main-gui");
 		
-		Scene scene = new Scene(new RunGUI(primaryStage), 350.0, 200.0);
+		Scene scene = new Scene(root, 375.0, 225.0);
 		scene.getStylesheets().add(stylesheet);
+		
 		primaryStage.setScene(scene);
 		primaryStage.setTitle("Adam's Expense Tracker");
-		primaryStage.show();
-		
-		
-		
+		primaryStage.show();				
 	}
-		
-
 }

@@ -61,11 +61,17 @@ public class HistoryTable extends TableView<Transaction>{
 		amountColumn.setCellValueFactory(cellData -> cellData.getValue().transactionAmountProperty().asObject());
 		amountColumn.setCellFactory(TextFieldTableCell.forTableColumn(new javafx.util.converter.DoubleStringConverter()));
 		amountColumn.prefWidthProperty().bind(this.widthProperty().multiply(0.1)); 
+		amountColumn.textProperty().addListener((observable, oldValue, newValue) -> {
+	        if (!newValue.matches("\\d*(\\.\\d{0,2})?")) {
+	        	amountColumn.setText(oldValue);
+	        }
+		});
 		amountColumn.setOnEditCommit(event-> {
 			try {
 				event.getRowValue().setTransactionAmount(event.getNewValue());
 				budget.overwrite();
                 update();
+                
 			} catch (NumberFormatException e){
 				System.out.println("Failed to edit amount.\n");
 				e.printStackTrace();

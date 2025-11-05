@@ -7,6 +7,7 @@ import javafx.scene.layout.*;
 import javafx.stage.Screen;
 
 public class TrackerPage extends BorderPane{
+	public TitlePane titlePane;
 	
 	public TrackerPage(RunGUI runGUI, String filePath) {
 		// Create budget
@@ -34,6 +35,7 @@ public class TrackerPage extends BorderPane{
 		titlePane.setMaxWidth(screenWidth);
 		titlePane.setPrefWidth(screenWidth);
 		titlePane.setMaxHeight(maxTitleHeight);
+		titlePane.getStyleClass().add("title-pane");
 		this.setTop(titlePane);
 		
 	    // Center: Budget Charts
@@ -41,6 +43,7 @@ public class TrackerPage extends BorderPane{
 		chartPane.setPadding(chartInsets);
 		chartPane.setMaxWidth(maxChartWidth);
 		chartPane.setMaxHeight(maxChartHeight);
+		chartPane.getStyleClass().add("chart-pane");
 		this.setCenter(chartPane);     
 		
 	    // Bottom: Line-by-line history
@@ -49,9 +52,10 @@ public class TrackerPage extends BorderPane{
 		historyPane.setMaxWidth(screenWidth);
 		historyPane.setMaxHeight(maxHistoryHeight);
 		historyPane.setPrefHeight(maxHistoryHeight);
+		historyPane.getStyleClass().add("history-pane");
 		
-		historyPane.setTitle(titlePane);
-		historyPane.setChart(chartPane);
+		historyPane.getHistoryTable().setTitle(titlePane);
+		historyPane.getHistoryTable().setChart(chartPane);
 		this.setBottom(historyPane);
 		
 		// Left: Filled with UI Stuff (i.e. buttons, input fields)
@@ -59,10 +63,13 @@ public class TrackerPage extends BorderPane{
 		inputPane.setPadding(inputInsets);
 		inputPane.setMaxWidth(maxInputWidth);
 		inputPane.setPrefWidth(maxInputWidth);
+		inputPane.getStyleClass().add("input-pane");
 		
 		inputPane.setHistoryTable(historyPane.getHistoryTable());
 		inputPane.setTitle(titlePane);
 		inputPane.setChart(chartPane);
 		this.setLeft(inputPane);
+		
+		
 	}
 }

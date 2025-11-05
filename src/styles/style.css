@@ -1,9 +1,30 @@
-/* Set border around charts */
-.chart {
-    -fx-border-color: black; 
-    -fx-border-width: 2px;   
-    -fx-border-style: solid; 
-}
+/********************************** Color Scheme *********************************
+
+Primary:
+Main Purple #492365
+Main Grey   #4a494d
+
+Complementary: high sat -> low sat
+-- Bluer purples:
+#70569e
+#a595c4
+#cbc3dc
+#f3eff6
+
+-- True purples:
+#814d9d
+#a275b3
+#d3c2df
+#f3f0f4
+
+Secondary:
+Blue   #2dbbc4
+Green  #91c74f
+Yellow #efad21
+Brown  #f16357
+*/
+
+/************************** Styling to fix visual bugs ****************************/
 
 /* Adjust legend so everything fits in pie chart*/
 .chart-legend {
@@ -16,22 +37,46 @@
     -fx-padding: 5;      
 }
 
-/* Chart income color */
-.default-color0.chart-bar {
+
+/************************************** General styling *******************************/
+.main-gui {
+	-fx-background-color: #cbc3dc;
+}
+
+Button, ToggleButton {
+	
+}
+
+
+
+
+
+
+
+
+
+.chart {
+    -fx-border-color: black; 
+    -fx-border-width: 2px;   
+    -fx-border-style: solid; 
+}
+
+.default-color0.chart-bar { /* income bar */
     -fx-bar-fill: green; 
 }
 
-/* Chart expense color */
-.default-color1.chart-bar {
+.default-color1.chart-bar { /* expense bar */
     -fx-bar-fill: orange; 
 }
 
-/* Disabled dates don't look greyed out */
 .date-picker:disabled {
     -fx-opacity: 1;       
     -fx-background-color: white;
     -fx-text-fill: black;
 }
+
+
+
 
 
 

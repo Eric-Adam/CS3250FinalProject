@@ -14,7 +14,6 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
 public class Budget {
-	private double budgetMax=0;
 	private ArrayList<Transaction> income = new ArrayList<Transaction>();
 	private ArrayList<Transaction> expenses = new ArrayList<Transaction>();
 	private final String filePath;
@@ -47,10 +46,10 @@ public class Budget {
     	for (Transaction transaction : transactions) {
         		tempAmount = transaction.getTransactionAmount();
         		balance += (transaction.isIncome()) ? tempAmount : -tempAmount;
-        		
-        		if(balance < 0.0)
-        			balance = 0.0;
     	}
+    	
+    	if(balance < 0.0)
+			balance = 0.0;
     	return balance;
     }
     
@@ -64,45 +63,39 @@ public class Budget {
         		balance += (transaction.isIncome()) ? tempAmount : -tempAmount;
         	}
     	}
+    	if(balance < 0.0)
+			balance = 0.0;
         
-    	if(balance > 0) return balance;
-    	else return 0.0;
+    	return balance;
     }
     
     public double getTotalExpenses() {
-    	double expenses = 0;
-    	double tempAmount =0;
+    	double total = 0;
     	
-    	for (Transaction transaction : transactions) {
-        		tempAmount = transaction.getTransactionAmount();
-        		expenses += (!transaction.isIncome()) ? tempAmount : 0.0;
+    	for (Transaction out : expenses) {
+    		total += out.getTransactionAmount();
     	}
         
-    	if(expenses > 0) return expenses;
-    	else return 0.0;
+    	return total;
     }
     
     public double getTotalIncome() {
-    	double income = 0;
-    	double tempAmount =0;
+    	double total = 0;
     	
-    	for (Transaction transaction : transactions) {
-        		tempAmount = transaction.getTransactionAmount();
-        		income += (transaction.isIncome()) ? tempAmount : 0.0;
-    	}
-        
-    	if(income > 0) return income;
-    	else return 0.0;
+    	for (Transaction in : income) 
+        		total += in.getTransactionAmount();
+        		
+    	return total;
     }
     
     public String getBudgetStatus() {
     	String status="";
     	double currentRemaining = getOverallBalance();
-    	if (currentRemaining > (0.4 * budgetMax))
+    	if (currentRemaining > (0.4 * getTotalIncome()))
     		status = "UNDER BUDGET";
-    	else if (currentRemaining > (0.2 * budgetMax))
+    	else if (currentRemaining > (0.2 * getTotalIncome()))
     		status = "TIGHT";
-    	else if (currentRemaining > (0.05 * budgetMax))
+    	else if (currentRemaining > (0.05 * getTotalIncome()))
     		status = "AT RISK";
     	else
     		status = "OVER BUDGET";
@@ -116,7 +109,7 @@ public class Budget {
 		
 		// Convert data to Transaction objects
 		List<Transaction> transactionList = transactionData.stream()
-		    .skip(1) // skips header
+		    .skip(1) // skip header
 		    .map(row -> new Transaction(Double.parseDouble(row[0]), 
 		    							row[1], 
 		    							row[2], 
@@ -127,13 +120,12 @@ public class Budget {
 		
 		// Fill income/expense lists
 		for (Transaction t : transactions) {
-			if (t.isIncome())
+			if (t.isIncome()) {
 				income.add(t);
+			}
 			else 
 				expenses.add(t);
-		}
-		for (Transaction t : income)
-			budgetMax += t.getTransactionAmount();
+		}			
 	}
     
 	// Loads data from CSV file as unparsed strings 
