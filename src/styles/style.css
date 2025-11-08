@@ -43,31 +43,75 @@ Brown  #f16357
 	-fx-background-color: #cbc3dc;
 }
 
-ToggleButton {
+.user-page ToggleButton {
 	-fx-color: #492365;
 	-fx-padding: 40px; 
 }
 
+.tracker-page ToggleButton {
+	-fx-color: #492365;
+	-fx-padding: 20px; 
+}
+.tracker-page {
+	-fx-font-size: 12px;
+	-fx-font-weight: BOLD;
+}
 
 
+.title-pane {
+	-fx-background-color: linear-gradient(
+        from 100% 0% to 0% 100%, 
+		#814d9d,
+		#a275b3,
+		#d3c2df,
+		#f3f0f4
+    );
+}
+.input-pane, .chart-pane {
+	-fx-background-color: #cbc3dc;
+}
 
+.history-pane {
+	-fx-background-color: linear-gradient(
+        from 0% 100% to 100% 0%, 
+		#70569e,
+		#a595c4,
+		#cbc3dc,
+		#f3eff6
+    );
+}
+Button {
+	-fx-color: #a595c4;
+	-fx-padding: 15px;
+}
 
-
-
-
+ComboBox {
+	-fx-color: #a595c4;
+	-fx-padding: 12px;
+}
 
 .chart {
     -fx-border-color: black; 
     -fx-border-width: 2px;   
     -fx-border-style: solid; 
+
+	-fx-background-color: #f3f0f4;
+}
+
+.history-table {
+	-fx-border-color: #4a494d;
+}
+.history-table ComboBox{
+	-fx-color: #f3eff6;
+		-fx-padding: 0;
 }
 
 .default-color0.chart-bar { /* income bar */
-    -fx-bar-fill: green; 
+    -fx-bar-fill: #91c74f; 
 }
 
 .default-color1.chart-bar { /* expense bar */
-    -fx-bar-fill: orange; 
+    -fx-bar-fill: #f16357; 
 }
 
 .date-picker:disabled {
@@ -76,12 +120,6 @@ ToggleButton {
     -fx-text-fill: black;
 }
 
-
-
-
-
-
-
-
-
-
+.separator {
+	-fx-background-color: #4a494d;	
+}

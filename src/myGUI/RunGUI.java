@@ -6,6 +6,9 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 public class RunGUI extends Pane{
+	private final double USER_WIDTH = 300.0;
+	private final double USER_HEIGHT = 160.0;
+	
 	private UserCoverPage userPage;
 	private TrackerPage trackerPage;
 	private Stage primaryStage;
@@ -49,8 +52,8 @@ public class RunGUI extends Pane{
 	    this.getChildren().add(userPage);
 
 	    // Resize to fit UserPage
-	    primaryStage.setWidth(375.0);
-	    primaryStage.setHeight(225.0);
+	    primaryStage.setWidth(USER_WIDTH);
+	    primaryStage.setHeight(USER_HEIGHT);
 	    primaryStage.centerOnScreen();
 	}
 

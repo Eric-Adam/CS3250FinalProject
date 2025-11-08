@@ -59,41 +59,5 @@ public class Transaction{
     public LocalDate getDate() { return date.get(); }
     public void setDate(LocalDate date) { this.date.set(date); }
     public ObjectProperty<LocalDate> dateProperty() { return date; }
-	
-	// Appends to CSV
-	public static void saveToCSV(String fileName, Transaction trans) {
-		List<String> arr = new ArrayList<String>();
-		arr.add(Double.toString(trans.getTransactionAmount()));
-		arr.add(escapeForCSV(trans.getCategory()));
-		arr.add(escapeForCSV(trans.getNote()));
-		arr.add(Boolean.toString(trans.isIncome()));
-		DateTimeFormatter  formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-		arr.add(formatter.format(trans.getDate()));
-		File file = new File(fileName);
-		
-		try (FileWriter writer = new FileWriter(file, true)) {
-			for (int i = 0; i < arr.size(); i++) {
-		        writer.append(arr.get(i));
-		        if (i < arr.size() - 1) {
-		            writer.append(",");
-		        }
-		    }
-		    writer.append("\n");
-		    
-		} catch (IOException e) {
-			System.out.println("Failed to write transaction to file");
-		}
-	}
-    
-	// Escapes double quotes and removes commas
-	private static String escapeForCSV(String value) {
-	    if (value.contains(",") || value.contains("\"")) {
-	        value = value.replace("\"", "\"\"");
-	        value = value.replace(",", "");
-	        return "\"" + value + "\"";
-	    }	
-	    if (value.contains(","))
-	    		value = value.replace(",", "");
-	    return value;
-	}
+
 }

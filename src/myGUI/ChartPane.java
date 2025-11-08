@@ -9,7 +9,9 @@ public class ChartPane extends AnchorPane{
 	
 	public ChartPane(Budget budget, double maxChartWidth) {
 		this.budget = budget;
-		this.charts = new BuildCharts(budget, this,maxChartWidth);
+		this.charts = new BuildCharts(budget, this, maxChartWidth);
+		
+		setTopAnchor(charts, 15.0);
 		this.getChildren().add(charts);
 		
 		charts.showLineChart();

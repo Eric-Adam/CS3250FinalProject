@@ -19,14 +19,26 @@ public class Budget {
 	private final String filePath;
 	
 	public ObservableList<Transaction> transactions = FXCollections.observableArrayList();
-    public static final String[] categories = {"Books","Car","Clothing","Credit Card","Entertainment",
-								   		 "Events","Gifts","Groceries","Household","Insurance",
-								   		 "Internet","Loan","Personal Care","Pets","Phone",
-								   		 "Rent","Retirement","Salary", "Savings","School","Spouse",
-								   		 "Subscriptions","Takeout/Delivery","Travel","Utilities","VA",
-								   		 "Miscellaneous"};
-    
-    
+	public static final String[] incomeCategories = 
+			{"Gifts","Household","Insurance","Loan","Retirement",
+			 "Salary","Transfer","Miscellaneous"};
+	
+	public static final String[] expenseCategories = 
+		{"Books","Car","Clothing","Credit Card","Entertainment",
+		 "Events","Gifts","Groceries","Health","Household",
+		 "Insurance","Internet","Loan","Personal Care","Pets",
+		 "Phone","Rent","Retirement","Savings","School",
+		 "Spouse","Subscriptions","Takeout/Delivery",
+		 "Transfer","Travel","Utilities","Miscellaneous"};
+	
+	public static final String[] categories = 
+		{"Books","Car","Clothing","Credit Card","Entertainment",
+   		 "Events","Gifts","Groceries","Health","Household","Insurance",
+   		 "Internet","Loan","Personal Care","Pets","Phone",
+   		 "Rent","Retirement","Salary", "Savings","School","Spouse",
+   		 "Subscriptions","Takeout/Delivery","Transfer","Travel","Utilities",
+   		 "Miscellaneous"};
+	
 
 	public Budget(String filePath) {
 		// Load data
@@ -105,7 +117,18 @@ public class Budget {
     
     private void loadTransactions() {
 		// Pull data from CSV
-		List<String[]> transactionData = loadCSV();
+		List<String[]> transactionData = new ArrayList<>();
+
+        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+            String line;
+
+            while ((line = br.readLine()) != null) {
+                String[] values = line.split(",");
+                transactionData.add(values); 
+            }
+        } catch (Exception e) {
+            System.out.println("Failed to load CSV data:\n" + e);
+        }
 		
 		// Convert data to Transaction objects
 		List<Transaction> transactionList = transactionData.stream()
@@ -126,23 +149,6 @@ public class Budget {
 			else 
 				expenses.add(t);
 		}			
-	}
-    
-	// Loads data from CSV file as unparsed strings 
-	private List<String[]> loadCSV() {
-        List<String[]> rows = new ArrayList<>();
-
-        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
-            String line;
-
-            while ((line = br.readLine()) != null) {
-                String[] values = line.split(",");
-                rows.add(values); 
-            }
-        } catch (Exception e) {
-            System.out.println("Failed to load CSV data:\n" + e);
-        }
-        return rows;	
 	}
  
     public void refreshData() {
@@ -184,6 +190,9 @@ public class Budget {
  			System.out.println("Failed to write to file");
  		}
     	
+    	// Sort transactions by date
+    	FXCollections.sort(transactions, (t1, t2) -> t1.getDate().compareTo(t2.getDate()));
+    	
     	// Add transactions back to file
     	for (Transaction trans : transactions) {
     		transStrings.clear();
@@ -206,6 +215,5 @@ public class Budget {
 				System.out.println("Failed to write transaction to file");
 			}
     	}
-    	refreshData();
     }
 }

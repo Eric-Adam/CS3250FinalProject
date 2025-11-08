@@ -23,12 +23,14 @@ public class InputPane extends VBox{
 	private ToggleButton editTransactionButton = new ToggleButton("Edit");
 	private ToggleButton deleteTransactionButton = new ToggleButton("Delete");
 	
-	private HBox newTransactionBudgetEntry = new HBox();
-	private HBox noteHbox = new HBox(5);
-	private HBox newTransactionTypeEntry = new HBox();
-	private HBox newTransactionAmountEntry = new HBox();
-	private HBox newTransactionDate = new HBox();
-	private HBox submitCancelTransaction = new HBox(5);
+	private HBox categoryBox = new HBox();
+	private HBox noteBox = new HBox(5);
+	private HBox transactionTypeBox = new HBox();
+	private HBox transactionAmountBox = new HBox();
+	private HBox transactionDateBox = new HBox();
+	private HBox submitCancelBox = new HBox(5);
+	
+	private Budget budget;
 	
 	public void setHistoryTable(HistoryTable historyTable) {
 		this.historyTable = historyTable;
@@ -43,8 +45,11 @@ public class InputPane extends VBox{
 	public InputPane(Budget budget) {
 		super(20);
 		// -----------------------------------Transaction Section ---------------------------------
+		this.getChildren().add(new Separator());
+		this.budget = budget;
+		
 		// Transaction control buttons
-		Label transactionLabel =  new Label("Transaction:");
+		Label transactionLabel =  new Label("\t\tTransactions:");
 		this.getChildren().add(transactionLabel);
 		
 		HBox transactionButtons = new HBox(5);
@@ -53,60 +58,53 @@ public class InputPane extends VBox{
 		this.getChildren().add(transactionButtons);
 		
 		// Add new transaction buttons/fields
+		// --- Income or expense field
+		Label newTransactionTypeLabel = new Label("Transaction Type:  ");
+		String[] transactionTypes = {"Income", "Expense"};
+		ComboBox<String> transactionType = new ComboBox<>();	
+		transactionTypeBox.getChildren().addAll(newTransactionTypeLabel,transactionType);
+		this.getChildren().add(transactionTypeBox);
+				
 		// --- Category field
-		Label newTransactionLabel = new Label("Category: ");
+		Label categoryLabel = new Label("Category: ");
 		ComboBox<String> transactionCategory = new ComboBox<>();
 		transactionCategory.setValue(Budget.categories[Budget.categories.length-1]);
-		transactionCategory.getItems().addAll(Budget.categories);
-
-		newTransactionBudgetEntry.getChildren().addAll(newTransactionLabel,transactionCategory);
-		this.getChildren().add(newTransactionBudgetEntry);
+		categoryBox.getChildren().addAll(categoryLabel,transactionCategory);
+		this.getChildren().add(categoryBox);
 		
 		// --- Note field
 		Label newNoteLabel = new Label("Notes: ");
 		TextField newNoteField = new TextField("");
-		
-		noteHbox.getChildren().addAll(newNoteLabel, newNoteField);
-		this.getChildren().add(noteHbox);
-		
-		// --- Income or expense field
-		Label newTransactionTypeLabel = new Label("Transaction Type:  ");
-		String[] transactionTypes = {"Income", "Expense"};
-		ComboBox<String> transactionType = new ComboBox<>();
-		transactionType.getItems().addAll(transactionTypes);
-		transactionType.setValue(transactionTypes[0]);
-		
-		newTransactionTypeEntry.getChildren().addAll(newTransactionTypeLabel,transactionType);
-		this.getChildren().add(newTransactionTypeEntry);
+		noteBox.getChildren().addAll(newNoteLabel, newNoteField);
+		this.getChildren().add(noteBox);
 		
 		// --- Amount field
 		Label newTransactionAmountLabel = new Label("Amount:      $");
 		TextField newTransactionAmountText = new TextField("0.00");
-		
-		newTransactionAmountEntry.getChildren().addAll(newTransactionAmountLabel,newTransactionAmountText);
-		this.getChildren().add(newTransactionAmountEntry);
+		transactionAmountBox.getChildren().addAll(newTransactionAmountLabel,newTransactionAmountText);
+		this.getChildren().add(transactionAmountBox);
 		
 		// --- Date field
 		Label newTransactionDateLabel = new Label("Date: ");
 		DatePicker newTransactionDateEntry = new DatePicker();
 		newTransactionDateEntry.setValue(LocalDate.now());
-		
-		newTransactionDate.getChildren().addAll(newTransactionDateLabel,newTransactionDateEntry);
-		this.getChildren().add(newTransactionDate);
+		transactionDateBox.getChildren().addAll(newTransactionDateLabel,newTransactionDateEntry);
+		this.getChildren().add(transactionDateBox);
 		
 		// --- Submit and cancel buttons
 		Button submitTransactionButton = new Button("Submit Transaction");
 		Button cancelNewTransactionButton = new Button("Cancel");
-		
-		submitCancelTransaction.getChildren().addAll(submitTransactionButton,cancelNewTransactionButton);
-		this.getChildren().add(submitCancelTransaction);
+		submitCancelBox.getChildren().addAll(submitTransactionButton,cancelNewTransactionButton);
+		this.getChildren().add(submitCancelBox);
 		
 		disableAddNew(true);
 		
 		
 		// -----------------------------------Chart Control Section -------------------------------
+		this.getChildren().add(new Separator());
+		
 		// Chart control buttons
-		Label chartLabel = new Label("Charts and Graphs:");
+		Label chartLabel = new Label("\t\tCharts and Graphs:");
 		this.getChildren().add(chartLabel);
 		
 		Button saveChartButton = new Button("Save");
@@ -116,7 +114,7 @@ public class InputPane extends VBox{
 		chartTypeComboBox.setValue("30-Day Transactions");
 		HBox chartTypeHbox = new HBox(5);
 		chartTypeHbox.getChildren().addAll(chartTypeComboBox,saveChartButton);
-		this.getChildren().add(chartTypeHbox);
+		this.getChildren().addAll(chartTypeHbox, new Separator());
 
 		
 		// ----------------------------------- Listener Section -----------------------------------		
@@ -131,12 +129,20 @@ public class InputPane extends VBox{
             	// Set to default
     			transactionCategory.setValue(Budget.categories[Budget.categories.length-1]);
     			newNoteField.setText("");
-    			transactionType.setValue(transactionTypes[0]);
     			newTransactionAmountText.setText("0.00");
     			newTransactionDateEntry.setValue(LocalDate.now());
     			
     			// Open Section
-    			disableAddNew(false);	
+    			transactionTypeBox.setVisible(true);
+    			transactionTypeBox.setManaged(true); 
+    			
+    			// Re-render stubborn comboBox
+    			transactionType.getItems().clear();
+    			transactionType.getItems().addAll(transactionTypes);
+    			transactionType.applyCss();
+    			transactionType.layout();
+    			transactionType.setValue(null);
+    			transactionType.setPromptText("Select");
     			
     			// Close addNewTransaction section if you hover over the historyTable
     			// Listener in listener to avoid historyTable being null
@@ -154,6 +160,21 @@ public class InputPane extends VBox{
 			
         });
 		
+		// --- --- Check transaction type before opening everything else
+		transactionType.setOnAction(event->{
+			transactionCategory.getItems().clear();
+			if (transactionType.getValue() != null) {
+				if (transactionType.getValue().equals(transactionTypes[0])) {
+					transactionCategory.getItems().addAll(Budget.incomeCategories);
+					disableAddNew(false);
+				}
+				else if(transactionType.getValue().equals(transactionTypes[1])){
+					transactionCategory.getItems().addAll(Budget.expenseCategories);
+					disableAddNew(false);
+				}
+			}
+		});
+		
 		// --- --- Transaction amount entry: forces entry to be valid
 		newTransactionAmountText.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.matches("\\d*(\\.\\d{0,2})?")) { 
@@ -163,7 +184,6 @@ public class InputPane extends VBox{
 		
 		// --- --- Submit Transaction: pulls data from fields and saves to them to CSV
 		submitTransactionButton.setOnAction(event -> {
-			String file = budget.getFilePath();
 			double amountEntry = Double.parseDouble(newTransactionAmountText.getText());
 			String categoryEntry = transactionCategory.getValue();
 			String noteEntry = newNoteField.getText();
@@ -177,11 +197,10 @@ public class InputPane extends VBox{
 					inOut = false;
 			
 			Transaction newTransaction = new Transaction(amountEntry, categoryEntry, noteEntry, inOut, dateEntry);
-			Transaction.saveToCSV(file, newTransaction);
-			
-			disableAddNew(true);
+			budget.transactions.add(newTransaction);
 			update();
 			
+			disableAddNew(true);			
 		});
 		
 		// --- --- Cancel Transaction: Resets addNewTransactionButton and closes new transaction section
@@ -215,7 +234,7 @@ public class InputPane extends VBox{
 		        disableEdit();
 
 		        // Indicate deleting is active 
-		        historyTable.setStyle("-fx-border-color: red; -fx-border-width: 2;");
+		        historyTable.setStyle("-fx-border-color: #f16357; -fx-border-width: 2;");
 
 		        // Select which transaction to delete
 		        historyTable.setOnMouseClicked(e -> {
@@ -236,7 +255,6 @@ public class InputPane extends VBox{
 		                // Remove selected transaction
 		                if (response == JOptionPane.YES_OPTION) {
 		                    budget.transactions.remove(selected);
-		                    budget.overwrite();
 		                    update();
 		                }
 		            }
@@ -284,20 +302,21 @@ public class InputPane extends VBox{
 	// Save chart with user specified location and name
 	private void saveChart(String fileName, Chart chart) {
 		WritableImage image = chart.snapshot(null, null);
-
-		FileChooser fileChooser = new FileChooser();
-		
-        fileChooser.setTitle("Save File");
-        fileChooser.setInitialFileName(fileName);
-        fileChooser.setInitialDirectory(new File(System.getProperty("user.home"), "Desktop"));
-        fileChooser.getExtensionFilters().add(
-                new FileChooser.ExtensionFilter("PNG Image", "*.png")
-            );
-
-        Stage stage = (Stage) chart.getScene().getWindow();
-        File file = fileChooser.showSaveDialog(stage);
 		
 		try {
+			FileChooser fileChooser = new FileChooser();
+			
+	        fileChooser.setTitle("Save File");
+	        fileChooser.setInitialFileName(fileName);
+	        fileChooser.setInitialDirectory(new File(System.getProperty("user.home"), "Desktop"));
+	        fileChooser.getExtensionFilters().add(
+	                new FileChooser.ExtensionFilter("PNG Image", "*.png")
+	            );
+	
+	        Stage stage = (Stage) chart.getScene().getWindow();
+	        File file = fileChooser.showSaveDialog(stage);
+		
+		
             ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);
         } 
 		catch (Exception e) {
@@ -308,6 +327,8 @@ public class InputPane extends VBox{
 
 	// Keep everything in sync
 	private void update() {
+		budget.overwrite();
+		
 		historyTable.update();
 		title.update();
 		chartPane.update();
@@ -319,19 +340,20 @@ public class InputPane extends VBox{
 		
 		addNewTransactionButton.setSelected(enabled);
 		
-		newTransactionBudgetEntry.setVisible(enabled); 
-		newTransactionAmountEntry.setVisible(enabled);
-		noteHbox.setVisible(enabled); 
-		newTransactionDate.setVisible(enabled); 
-		submitCancelTransaction.setVisible(enabled); 
-		newTransactionTypeEntry.setVisible(enabled); 
-	
-		newTransactionBudgetEntry.setManaged(enabled);
-		newTransactionAmountEntry.setManaged(enabled);
-		noteHbox.setManaged(enabled);
-		newTransactionDate.setManaged(enabled);
-		submitCancelTransaction.setManaged(enabled);
-		newTransactionTypeEntry.setManaged(enabled);
+		transactionTypeBox.setVisible(enabled);
+		categoryBox.setVisible(enabled); 
+		transactionAmountBox.setVisible(enabled);
+		noteBox.setVisible(enabled); 
+		transactionDateBox.setVisible(enabled); 
+		submitCancelBox.setVisible(enabled);  
+		
+		transactionTypeBox.setManaged(enabled);
+		categoryBox.setManaged(enabled);
+		transactionAmountBox.setManaged(enabled);
+		noteBox.setManaged(enabled);
+		transactionDateBox.setManaged(enabled);
+		submitCancelBox.setManaged(enabled);
+		
 	}
 	
 	// Disable edit section
@@ -346,6 +368,7 @@ public class InputPane extends VBox{
 	private void disableDelete() {
 		deleteTransactionButton.setSelected(false);
 		
+		historyTable.setOnMouseClicked(null);
 		historyTable.setStyle("");
 	}
 }

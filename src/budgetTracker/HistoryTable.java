@@ -27,6 +27,8 @@ public class HistoryTable extends TableView<Transaction>{
 		this.budget = budget;
 		
 		// Set up TableView		
+		this.getStyleClass().add("history-table");
+		
 		// --- Tableview Columns
 		// --- --- Index column
 		TableColumn<Transaction, Integer> indexColumn = new TableColumn<>("ID");
@@ -52,7 +54,6 @@ public class HistoryTable extends TableView<Transaction>{
 		categoryColumn.prefWidthProperty().bind(this.widthProperty().multiply(0.2)); 
 		categoryColumn.setOnEditCommit(event -> {
 			event.getRowValue().setCategory(event.getNewValue());
-			budget.overwrite();
             update();
 		});
 
@@ -69,7 +70,6 @@ public class HistoryTable extends TableView<Transaction>{
 		amountColumn.setOnEditCommit(event-> {
 			try {
 				event.getRowValue().setTransactionAmount(event.getNewValue());
-				budget.overwrite();
                 update();
                 
 			} catch (NumberFormatException e){
@@ -85,7 +85,6 @@ public class HistoryTable extends TableView<Transaction>{
 		noteColumn.prefWidthProperty().bind(this.widthProperty().multiply(0.4)); 
 		noteColumn.setOnEditCommit(event-> {
 			event.getRowValue().setNote(event.getNewValue());
-			budget.overwrite();
             update();
 		});
 		
@@ -94,7 +93,6 @@ public class HistoryTable extends TableView<Transaction>{
 		dateColumn.prefWidthProperty().bind(this.widthProperty().multiply(0.15)); 
 		dateColumn.setOnEditCommit(event -> {
 		    event.getRowValue().setDate(event.getNewValue());
-		    budget.overwrite();
             update();
 		});
 		dateColumn.setCellFactory(column -> new TableCell<Transaction, LocalDate>() {
@@ -165,7 +163,6 @@ public class HistoryTable extends TableView<Transaction>{
 
 		            checkBox.setOnAction(event -> {
 		                transaction.setIncome(checkBox.isSelected());
-		                budget.overwrite();
 		                update();
 		            });
 		        }
@@ -201,7 +198,9 @@ public class HistoryTable extends TableView<Transaction>{
 	}
 	
 	public void update() {
+		budget.overwrite();
 		budget.refreshData();
+		
 		title.update();
 		chartPane.update();
 	}

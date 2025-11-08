@@ -6,6 +6,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import javax.swing.JOptionPane;
+
+import budgetTracker.Budget;
 import budgetTracker.NewUser;
 import budgetTracker.Transaction;
 import javafx.scene.control.*;
@@ -13,10 +16,10 @@ import javafx.scene.layout.*;
 import javafx.stage.Stage;
 
 public class UserCoverPage extends AnchorPane{
-	private final double WINDOW_WIDTH_START = 200.0;
-	private final double WINDOW_HEIGHT_START = 325.0;
-	private final double WINDOW_WIDTH_START = 200.0;
-	private final double WINDOW_WIDTH_START = 200.0;
+	private final double WINDOW_WIDTH = 300.0;
+	private final double WINDOW_HEIGHT_START = 160.0;
+	private final double WINDOW_HEIGHT_LOGIN = 230.0;
+	private final double WINDOW_HEIGHT_NEW_USER = 350.0;
 	
 	private String userFile = "src/resources/userData.csv";
 	private ArrayList<String> usernames = new ArrayList<String>();
@@ -43,7 +46,7 @@ public class UserCoverPage extends AnchorPane{
 		// Login Section
 		loginButton = new ToggleButton("Login");
 		newUserButton = new ToggleButton("New User");
-		HBox loginVbox = new HBox(5);
+		HBox loginVbox = new HBox(15);
 		loginVbox.getChildren().addAll(loginButton, newUserButton);
 		
 		// Known User Section
@@ -73,7 +76,7 @@ public class UserCoverPage extends AnchorPane{
 		submitUserButton = new Button("Submit");
 		
 		// Put it all together
-		VBox centerVBox = new VBox(5);
+		VBox centerVBox = new VBox(15);
 		centerVBox.getChildren().addAll(loginVbox, selectUserVbox, fNameHbox, 
 				lNameHbox, initialValueHbox, submitUserButton);
 		setTopAnchor(centerVBox, 10.0);
@@ -152,6 +155,8 @@ public class UserCoverPage extends AnchorPane{
 			// Ensure fields aren't empty
 			Boolean fNameFilled = !fNameField.getText().equals("");
 			Boolean lNameFilled = !lNameField.getText().equals("");
+			
+			@SuppressWarnings("unlikely-arg-type") // 
 			Boolean initalAmountFilled = !initialValueField.equals("");
 			Boolean existingUser = false;
 			
@@ -160,11 +165,14 @@ public class UserCoverPage extends AnchorPane{
 			String newUserName = (fNameFilled && lNameFilled)? firstName+" "+lastName: null;
 			
 			for (String user : usernames) {
-				if (newUserName.equals(user))
+				if (newUserName != null && newUserName.equalsIgnoreCase(user)) {
 					existingUser = true;
+					JOptionPane.showMessageDialog(null, "Profile for " + user + " already exists.");
+					disableNewUser(true);
+				}
 			}
 
-			if (fNameFilled && lNameFilled && initalAmountFilled && !existingUser) {
+			if (newUserName != null && initalAmountFilled && !existingUser) {
 				Double initialAmount = Double.parseDouble(initialValueField.getText());
 				disableNewUser(true);
 				createNewUser(initialAmount, firstName, lastName);
@@ -203,7 +211,8 @@ public class UserCoverPage extends AnchorPane{
 		// Save data
 		saveToCSV(userFile, addUser);
 		saveToCSV(userDataFile, newUserData);
-		Transaction.saveToCSV(userDataFile.toString(), initialTransaction);
+		Budget budget = new Budget(user.getFilePath());
+		budget.transactions.add(initialTransaction);
 		
 		runGUI.setUser(addUser.getFirst());
 		runGUI.switchToTracker(userDataFile.toString());
@@ -277,9 +286,9 @@ public class UserCoverPage extends AnchorPane{
 		submitUserButton.setManaged(enable);
 		
 		if (enable)
-			resizeWindow(350, 400);
+			resizeWindow(WINDOW_HEIGHT_NEW_USER, WINDOW_WIDTH);
 		else
-			resizeWindow(200, 350);		
+			resizeWindow(WINDOW_HEIGHT_START, WINDOW_WIDTH);		
 	}
 	
 	private void disableLogin(boolean disable) {
@@ -291,9 +300,9 @@ public class UserCoverPage extends AnchorPane{
 		selectUserVbox.setManaged(enable);
 		
 		if (enable)
-			resizeWindow(200, 375);
+			resizeWindow(WINDOW_HEIGHT_LOGIN, WINDOW_WIDTH);
 		else
-			resizeWindow(200, 350);
+			resizeWindow(WINDOW_HEIGHT_START, WINDOW_WIDTH);
 	}
 	
 	// Change window size to fit appearing/disappearing nodes
