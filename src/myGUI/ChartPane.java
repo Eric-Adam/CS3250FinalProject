@@ -1,6 +1,8 @@
 package myGUI;
 
-import budgetTracker.*;
+import budgetTracker.Budget;
+import budgetTracker.BuildCharts;
+
 import javafx.scene.layout.AnchorPane;
 
 public class ChartPane extends AnchorPane{

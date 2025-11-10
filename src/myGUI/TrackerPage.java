@@ -1,9 +1,12 @@
 package myGUI;
 
 import budgetTracker.Budget;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Rectangle2D;
-import javafx.scene.layout.*;
+
+import javafx.scene.layout.BorderPane;
+
 import javafx.stage.Screen;
 
 public class TrackerPage extends BorderPane{

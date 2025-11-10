@@ -2,8 +2,10 @@ package myGUI;
 
 import budgetTracker.Budget;
 import budgetTracker.HistoryTable;
+
 import javafx.scene.control.Label;
 import javafx.scene.layout.VBox;
+
 import javafx.stage.Screen;
 
 public class HistoryPane extends VBox{

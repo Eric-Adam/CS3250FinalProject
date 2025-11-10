@@ -1,10 +1,14 @@
 package myGUI;
 
 import budgetTracker.Budget;
+
 import javafx.geometry.Rectangle2D;
+
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
-import javafx.scene.layout.*;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
+
 import javafx.stage.Screen;
 
 public class TitlePane extends AnchorPane{

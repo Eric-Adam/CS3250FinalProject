@@ -1,14 +1,21 @@
 package budgetTracker;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.Comparator;
 
 import javafx.collections.FXCollections;
 import javafx.collections.transformation.SortedList;
 
-import javafx.scene.control.*;
+import javafx.scene.control.CheckBox;
+import javafx.scene.control.ContentDisplay;
+import javafx.scene.control.DatePicker;
+import javafx.scene.control.TableCell;
+import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableRow;
+import javafx.scene.control.TableView;
 import javafx.scene.control.cell.ComboBoxTableCell;
 import javafx.scene.control.cell.TextFieldTableCell;
+
 import myGUI.ChartPane;
 import myGUI.TitlePane;
 
@@ -185,7 +192,7 @@ public class HistoryTable extends TableView<Transaction>{
 		    }
 		});		
 		
-		// --- Add columns to tableview
+		// --- Add columns to table view
 		this.getColumns().addAll(indexColumn,categoryColumn,amountColumn, 
 									  noteColumn,dateColumn);
 		
@@ -193,7 +200,7 @@ public class HistoryTable extends TableView<Transaction>{
 		SortedList<Transaction> sortedList = new SortedList<>(budget.transactions);
 		sortedList.setComparator(Comparator.comparing(Transaction::getTransactionID).reversed());
 		
-		// Set data for tableview
+		// Set data for table view
 		this.setItems(sortedList);
 	}
 	

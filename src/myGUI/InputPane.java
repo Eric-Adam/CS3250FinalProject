@@ -1,17 +1,32 @@
 package myGUI;
 import java.io.File;
 import java.time.LocalDate;
+import java.util.ArrayList;
 
 import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
 
-import budgetTracker.*;
+import budgetTracker.Budget;
+import budgetTracker.HistoryTable;
+import budgetTracker.Transaction;
+
 import javafx.embed.swing.SwingFXUtils;
+
 import javafx.scene.chart.Chart;
-import javafx.scene.control.*;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
+import javafx.scene.control.Separator;
+import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.image.WritableImage;
-import javafx.scene.layout.*;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
@@ -25,24 +40,10 @@ public class InputPane extends VBox{
 	private ToggleButton editTransactionButton = new ToggleButton("Edit");
 	private ToggleButton deleteTransactionButton = new ToggleButton("Delete");
 	
-	private HBox categoryBox = new HBox();
-	private HBox noteBox = new HBox(5);
-	private HBox transactionTypeBox = new HBox();
-	private HBox transactionAmountBox = new HBox();
-	private HBox transactionDateBox = new HBox();
-	private HBox submitCancelBox = new HBox(5);
+	private ArrayList<HBox> hBoxList = new ArrayList<>(); 
 	
 	private Budget budget;
 	
-	public void setHistoryTable(HistoryTable historyTable) {
-		this.historyTable = historyTable;
-	}
-	public void setTitle(TitlePane title) {
-		this.title = title;
-	}
-	public void setChart(ChartPane chartPane) {
-		this.chartPane = chartPane;
-	}
 	
 	public InputPane(Budget budget) {
 		super(20);
@@ -67,39 +68,57 @@ public class InputPane extends VBox{
 		transactionType.getItems().clear();
 		transactionType.getItems().addAll(transactionTypes);
 		transactionType.setPromptText("Select");
+		
+		HBox transactionTypeBox = new HBox();
 		transactionTypeBox.getChildren().addAll(newTransactionTypeLabel,transactionType);
+		hBoxList.add(transactionTypeBox);
 		this.getChildren().add(transactionTypeBox);
 				
 		// --- Category field
 		Label categoryLabel = new Label("Category: ");
 		ComboBox<String> transactionCategory = new ComboBox<>();
 		transactionCategory.setValue(Budget.categories[Budget.categories.length-1]);
+		
+		HBox categoryBox = new HBox();
 		categoryBox.getChildren().addAll(categoryLabel,transactionCategory);
+		hBoxList.add(categoryBox);
 		this.getChildren().add(categoryBox);
 		
 		// --- Note field
 		Label newNoteLabel = new Label("Notes: ");
 		TextField newNoteField = new TextField("");
+		
+		HBox noteBox = new HBox(5);
 		noteBox.getChildren().addAll(newNoteLabel, newNoteField);
+		hBoxList.add(noteBox);
 		this.getChildren().add(noteBox);
 		
 		// --- Amount field
 		Label newTransactionAmountLabel = new Label("Amount:      $");
 		TextField newTransactionAmountText = new TextField("0.00");
+		
+		HBox transactionAmountBox = new HBox();
 		transactionAmountBox.getChildren().addAll(newTransactionAmountLabel,newTransactionAmountText);
+		hBoxList.add(transactionAmountBox);
 		this.getChildren().add(transactionAmountBox);
 		
 		// --- Date field
 		Label newTransactionDateLabel = new Label("Date: ");
 		DatePicker newTransactionDateEntry = new DatePicker();
 		newTransactionDateEntry.setValue(LocalDate.now());
+		
+		HBox transactionDateBox = new HBox();
 		transactionDateBox.getChildren().addAll(newTransactionDateLabel,newTransactionDateEntry);
+		hBoxList.add(transactionDateBox);
 		this.getChildren().add(transactionDateBox);
 		
 		// --- Submit and cancel buttons
 		Button submitTransactionButton = new Button("Submit Transaction");
 		Button cancelNewTransactionButton = new Button("Cancel");
+		
+		HBox submitCancelBox = new HBox(5);
 		submitCancelBox.getChildren().addAll(submitTransactionButton,cancelNewTransactionButton);
+		hBoxList.add(submitCancelBox);
 		this.getChildren().add(submitCancelBox);
 		
 		disableAddNew(true);
@@ -162,6 +181,7 @@ public class InputPane extends VBox{
 		// --- --- Check transaction type before opening everything else
 		transactionType.setOnAction(event->{
 			transactionCategory.getItems().clear();
+			
 			if (transactionType.getValue() != null) {
 				if (transactionType.getValue().equals(transactionTypes[1])) {
 					transactionCategory.getItems().addAll(Budget.incomeCategories);
@@ -181,21 +201,15 @@ public class InputPane extends VBox{
             }
         });
 		
-		// --- --- Submit Transaction: pulls data from fields and saves to them to CSV
+		// --- --- Submit Transaction: pulls data from fields, adds it to the transaction list and updates database
 		submitTransactionButton.setOnAction(event -> {
 			double amountEntry = Double.parseDouble(newTransactionAmountText.getText());
 			String categoryEntry = transactionCategory.getValue();
 			String noteEntry = newNoteField.getText();
-			String typeEntry = transactionType.getValue();
+			Boolean typeEntry = transactionType.getValue().equalsIgnoreCase("income");
 			LocalDate dateEntry = newTransactionDateEntry.getValue();
-			boolean inOut;
 			
-			if (typeEntry.equalsIgnoreCase("income")) 
-				inOut = true;
-			 else 
-					inOut = false;
-			
-			Transaction newTransaction = new Transaction(amountEntry, categoryEntry, noteEntry, inOut, dateEntry);
+			Transaction newTransaction = new Transaction(amountEntry, categoryEntry, noteEntry, typeEntry, dateEntry);
 			budget.transactions.add(newTransaction);
 			update();
 			
@@ -209,13 +223,12 @@ public class InputPane extends VBox{
 			disableAddNew(true);			
 		});
 		
-		// --- --- Cancel Transaction: Resets addNewTransactionButton and closes new transaction section
+		// --- --- Cancel Transaction: Closes new transaction section
 		cancelNewTransactionButton.setOnAction(event -> {	
 			disableAddNew(true);
         });		
 		
-		// --- Edit transaction listeners
-		// historyTable.getColumns().add/remove(historyTable.incomeColumn);
+		// --- Edit transaction listener: Makes table view editable and adds/removes column to change income type
 		editTransactionButton.setOnAction(event->{
 			// Close other sections
 			disableAddNew(true);
@@ -227,12 +240,13 @@ public class InputPane extends VBox{
 				historyTable.getColumns().add(historyTable.incomeColumn);
 			}
 			else {
+				// Close section
 				disableEdit();
 			}
 		});
 		
 
-		// --- Delete transaction listeners
+		// --- Delete transaction listener
 		deleteTransactionButton.setOnAction(event -> {
 		    if (deleteTransactionButton.isSelected()) {
 		        // Close other sections
@@ -261,6 +275,7 @@ public class InputPane extends VBox{
 		                // Remove selected transaction
 		                if (response == JOptionPane.YES_OPTION) {
 		                    budget.transactions.remove(selected);
+		                    showAlert("Transaction removed","Removed Transaction");
 		                    update();
 		                }
 		            }
@@ -317,12 +332,10 @@ public class InputPane extends VBox{
         fileChooser.getExtensionFilters().add(
                 new FileChooser.ExtensionFilter("PNG Image", "*.png")
             );
-
-        Stage stage = (Stage) chart.getScene().getWindow();
         
 		try {
 			
-	        File file = fileChooser.showSaveDialog(stage);
+	        File file = fileChooser.showSaveDialog(primaryStage);
 	        
             ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);
 			showAlert("Successfully saved chart " +file.getName(), "Saved Successfully");
@@ -348,20 +361,10 @@ public class InputPane extends VBox{
 		
 		addNewTransactionButton.setSelected(enabled);
 		
-		transactionTypeBox.setVisible(enabled);
-		categoryBox.setVisible(enabled); 
-		transactionAmountBox.setVisible(enabled);
-		noteBox.setVisible(enabled); 
-		transactionDateBox.setVisible(enabled); 
-		submitCancelBox.setVisible(enabled);  
-		
-		transactionTypeBox.setManaged(enabled);
-		categoryBox.setManaged(enabled);
-		transactionAmountBox.setManaged(enabled);
-		noteBox.setManaged(enabled);
-		transactionDateBox.setManaged(enabled);
-		submitCancelBox.setManaged(enabled);
-		
+		for (HBox box : hBoxList) {
+			box.setVisible(enabled);
+			box.setManaged(enabled);
+		}		
 	}
 	
 	// Disable edit section
@@ -394,5 +397,14 @@ public class InputPane extends VBox{
 	}
 	public void setStage(Stage stage) {
 		this.primaryStage = stage;
+	}
+	public void setHistoryTable(HistoryTable historyTable) {
+		this.historyTable = historyTable;
+	}
+	public void setTitle(TitlePane title) {
+		this.title = title;
+	}
+	public void setChart(ChartPane chartPane) {
+		this.chartPane = chartPane;
 	}
 }
