@@ -40,16 +40,19 @@ Brown  #f16357
 
 /************************************** General styling *******************************/
 .main-gui {
-	-fx-background-color: #cbc3dc;
+	-fx-background-color: linear-gradient(
+        from 0% 0% to 0% 100%, 
+		#d3c2df,
+		#cbc3dc
+    );
 }
 
-.user-page ToggleButton {
+ToggleButton {
 	-fx-color: #492365;
 	-fx-padding: 40px; 
 }
 
 .tracker-page ToggleButton {
-	-fx-color: #492365;
 	-fx-padding: 20px; 
 }
 .tracker-page {
@@ -63,21 +66,22 @@ Brown  #f16357
         from 100% 0% to 0% 100%, 
 		#814d9d,
 		#a275b3,
-		#d3c2df,
-		#f3f0f4
+		#d3c2df
     );
 }
 .input-pane, .chart-pane {
-	-fx-background-color: #cbc3dc;
+	linear-gradient(
+        from 0% 0% to 0% 100%, 
+		#d3c2df,
+		#cbc3dc
+    );
 }
-
 .history-pane {
 	-fx-background-color: linear-gradient(
         from 0% 100% to 100% 0%, 
 		#70569e,
 		#a595c4,
-		#cbc3dc,
-		#f3eff6
+		#cbc3dc
     );
 }
 Button {

@@ -68,6 +68,7 @@ public class TrackerPage extends BorderPane{
 		inputPane.setHistoryTable(historyPane.getHistoryTable());
 		inputPane.setTitle(titlePane);
 		inputPane.setChart(chartPane);
+		inputPane.setStage(runGUI.getStage());
 		this.setLeft(inputPane);
 		
 		

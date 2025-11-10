@@ -11,11 +11,11 @@ public class RunGUI extends Pane{
 	
 	private UserCoverPage userPage;
 	private TrackerPage trackerPage;
-	private Stage primaryStage;
+	public Stage primaryStage;
 	private String user;
 	
 	public RunGUI(Stage primaryStage){
-		this.primaryStage = primaryStage;
+		setStage(primaryStage);
 			
 		// Create Cover Page
 		userPage = new UserCoverPage(primaryStage, this);
@@ -59,4 +59,8 @@ public class RunGUI extends Pane{
 
 	public String getUser() {return user;}
 	public void setUser(String user) {this.user = user;	}
+	
+	public Stage getStage() {return primaryStage;}
+	public void setStage(Stage Stage) {this.primaryStage = Stage;	}
+	
 }

@@ -9,6 +9,7 @@ import budgetTracker.*;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.scene.chart.Chart;
 import javafx.scene.control.*;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.WritableImage;
 import javafx.scene.layout.*;
 import javafx.stage.FileChooser;
@@ -18,6 +19,7 @@ public class InputPane extends VBox{
 	private HistoryTable historyTable;
 	private ChartPane chartPane;
 	private TitlePane title;
+	private Stage primaryStage;
 	
 	private ToggleButton addNewTransactionButton = new ToggleButton("Add New");
 	private ToggleButton editTransactionButton = new ToggleButton("Edit");
@@ -60,8 +62,11 @@ public class InputPane extends VBox{
 		// Add new transaction buttons/fields
 		// --- Income or expense field
 		Label newTransactionTypeLabel = new Label("Transaction Type:  ");
-		String[] transactionTypes = {"Income", "Expense"};
+		String[] transactionTypes = {"Select", "Income", "Expense"};
 		ComboBox<String> transactionType = new ComboBox<>();	
+		transactionType.getItems().clear();
+		transactionType.getItems().addAll(transactionTypes);
+		transactionType.setPromptText("Select");
 		transactionTypeBox.getChildren().addAll(newTransactionTypeLabel,transactionType);
 		this.getChildren().add(transactionTypeBox);
 				
@@ -135,14 +140,8 @@ public class InputPane extends VBox{
     			// Open Section
     			transactionTypeBox.setVisible(true);
     			transactionTypeBox.setManaged(true); 
+    			transactionType.setValue(transactionTypes[0]);
     			
-    			// Re-render stubborn comboBox
-    			transactionType.getItems().clear();
-    			transactionType.getItems().addAll(transactionTypes);
-    			transactionType.applyCss();
-    			transactionType.layout();
-    			transactionType.setValue(null);
-    			transactionType.setPromptText("Select");
     			
     			// Close addNewTransaction section if you hover over the historyTable
     			// Listener in listener to avoid historyTable being null
@@ -164,11 +163,11 @@ public class InputPane extends VBox{
 		transactionType.setOnAction(event->{
 			transactionCategory.getItems().clear();
 			if (transactionType.getValue() != null) {
-				if (transactionType.getValue().equals(transactionTypes[0])) {
+				if (transactionType.getValue().equals(transactionTypes[1])) {
 					transactionCategory.getItems().addAll(Budget.incomeCategories);
 					disableAddNew(false);
 				}
-				else if(transactionType.getValue().equals(transactionTypes[1])){
+				else if(transactionType.getValue().equals(transactionTypes[2])){
 					transactionCategory.getItems().addAll(Budget.expenseCategories);
 					disableAddNew(false);
 				}
@@ -199,6 +198,13 @@ public class InputPane extends VBox{
 			Transaction newTransaction = new Transaction(amountEntry, categoryEntry, noteEntry, inOut, dateEntry);
 			budget.transactions.add(newTransaction);
 			update();
+			
+			showAlert("Added Transaction"
+					  +"\nCategory:\t"+categoryEntry
+					  +"\nAmount:\t$"+amountEntry
+					  +"\nNote:\t"+noteEntry
+					  +"\nDate:\t"+dateEntry,
+					  "Added Transaction");
 			
 			disableAddNew(true);			
 		});
@@ -303,25 +309,27 @@ public class InputPane extends VBox{
 	private void saveChart(String fileName, Chart chart) {
 		WritableImage image = chart.snapshot(null, null);
 		
+		FileChooser fileChooser = new FileChooser();
+		
+        fileChooser.setTitle("Save File");
+        fileChooser.setInitialFileName(fileName);
+        fileChooser.setInitialDirectory(new File(System.getProperty("user.home"), "Desktop"));
+        fileChooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("PNG Image", "*.png")
+            );
+
+        Stage stage = (Stage) chart.getScene().getWindow();
+        
 		try {
-			FileChooser fileChooser = new FileChooser();
 			
-	        fileChooser.setTitle("Save File");
-	        fileChooser.setInitialFileName(fileName);
-	        fileChooser.setInitialDirectory(new File(System.getProperty("user.home"), "Desktop"));
-	        fileChooser.getExtensionFilters().add(
-	                new FileChooser.ExtensionFilter("PNG Image", "*.png")
-	            );
-	
-	        Stage stage = (Stage) chart.getScene().getWindow();
 	        File file = fileChooser.showSaveDialog(stage);
-		
-		
+	        
             ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);
+			showAlert("Successfully saved chart " +file.getName(), "Saved Successfully");
+
         } 
 		catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "Failed to save chart", "Save Failure", JOptionPane.ERROR_MESSAGE);
-            e.printStackTrace();
+			showAlert("Failed to save chart", "Save Failure");
         }
 	}
 
@@ -370,5 +378,21 @@ public class InputPane extends VBox{
 		
 		historyTable.setOnMouseClicked(null);
 		historyTable.setStyle("");
+	}
+	
+	// Show alerts
+	private void showAlert(String message, String title) {
+		Alert alert = new Alert(AlertType.NONE, message, ButtonType.OK);
+		
+		alert.setTitle(title);
+		alert.initOwner(primaryStage);
+		alert.showAndWait();
+	}
+	
+	public Stage getStage() {
+		return primaryStage;
+	}
+	public void setStage(Stage stage) {
+		this.primaryStage = stage;
 	}
 }

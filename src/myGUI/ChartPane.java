@@ -25,4 +25,6 @@ public class ChartPane extends AnchorPane{
 		charts.createPieChart();
 		charts.createBarChart();
 	}
+	
+	
 }
