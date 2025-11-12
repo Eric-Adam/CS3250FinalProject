@@ -18,11 +18,9 @@ public class TrackerPage extends BorderPane{
 		
 		// Get screen sizes to set max limits for each Pane
 		Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
-		double maxTitleHeight = screenBounds.getHeight() * 0.2;
-		double maxHistoryHeight = screenBounds.getHeight() * 0.35;
-		double maxChartHeight = screenBounds.getHeight() * 0.4; 
+		double maxTitleHeight = screenBounds.getHeight() * 0.2; // TODO: hardcode into something else
 		
-		double screenWidth = screenBounds.getWidth();
+		double screenWidth = screenBounds.getWidth(); // TODO: make dynamic on user resize
 		double maxInputWidth = screenBounds.getWidth() * 0.2;
 		double maxChartWidth = screenBounds.getWidth() * 0.8;
 		
@@ -45,7 +43,6 @@ public class TrackerPage extends BorderPane{
 		ChartPane chartPane = new ChartPane(budget, maxChartWidth);
 		chartPane.setPadding(chartInsets);
 		chartPane.setMaxWidth(maxChartWidth);
-		chartPane.setMaxHeight(maxChartHeight);
 		chartPane.getStyleClass().add("chart-pane");
 		this.setCenter(chartPane);     
 		

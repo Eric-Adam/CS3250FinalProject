@@ -1,16 +1,16 @@
 package myGUI;
+
 import java.io.File;
 import java.time.LocalDate;
-import java.util.ArrayList;
-
 import javax.imageio.ImageIO;
-import javax.swing.JOptionPane;
+import javafx.embed.swing.SwingFXUtils;
+
+import java.util.ArrayList;
+import java.util.Optional;
 
 import budgetTracker.Budget;
 import budgetTracker.HistoryTable;
 import budgetTracker.Transaction;
-
-import javafx.embed.swing.SwingFXUtils;
 
 import javafx.scene.chart.Chart;
 import javafx.scene.control.Alert;
@@ -262,18 +262,19 @@ public class InputPane extends VBox{
 
 		            // Confirm user wants to delete transaction
 		            if (selected != null) {
-		                int response = JOptionPane.showConfirmDialog(null,
-		                    "Are you sure you want to delete this transaction?\n\n"
-		                    + "Category: " + selected.getCategory()
-		                    + "\nAmount: $" + selected.getTransactionAmount()
-		                    + "\nNote: " + selected.getNote()
-		                    + "\nDate: " + selected.getDate(),
-		                    "Confirm Deletion",
-		                    JOptionPane.YES_NO_OPTION
-		                );
+		            	String confirmationMessage = "Are you sure you want to delete this transaction?\n"
+			                    + "\nCategory: " + selected.getCategory()
+			                    + "\nAmount: $" + selected.getTransactionAmount()
+			                    + "\nNote: " + selected.getNote()
+			                    + "\nDate: " + selected.getDate();
+		            	
+		            	Alert deleteConfirmation = new Alert(AlertType.CONFIRMATION, confirmationMessage);
+		            	deleteConfirmation.setTitle("Deletion Confirmation");
+		            	
+		            	Optional<ButtonType> response = deleteConfirmation.showAndWait();
 		                
 		                // Remove selected transaction
-		                if (response == JOptionPane.YES_OPTION) {
+		                if (response.isPresent() && response.get() == ButtonType.OK) {
 		                    budget.transactions.remove(selected);
 		                    showAlert("Transaction removed","Removed Transaction");
 		                    update();

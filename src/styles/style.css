@@ -39,14 +39,6 @@ Brown  #f16357
 
 
 /************************************** General styling *******************************/
-.main-gui {
-	-fx-background-color: linear-gradient(
-        from 0% 0% to 0% 100%, 
-		#d3c2df,
-		#cbc3dc
-    );
-}
-
 ToggleButton {
 	-fx-color: #492365;
 	-fx-padding: 40px; 
@@ -60,29 +52,29 @@ ToggleButton {
 	-fx-font-weight: BOLD;
 }
 
-
 .title-pane {
 	-fx-background-color: linear-gradient(
-        from 100% 0% to 0% 100%, 
+        to left, 
 		#814d9d,
 		#a275b3,
 		#d3c2df
     );
 }
-.input-pane, .chart-pane {
-	linear-gradient(
-        from 0% 0% to 0% 100%, 
+.input-pane, .chart-pane, .main-gui{
+	-fx-background-color: linear-gradient(
+        to bottom, 
 		#d3c2df,
 		#cbc3dc
     );
 }
+}
 .history-pane {
 	-fx-background-color: linear-gradient(
-        from 0% 100% to 100% 0%, 
+        to right, 
 		#70569e,
 		#a595c4,
 		#cbc3dc
-    );
+	);
 }
 Button {
 	-fx-color: #a595c4;
@@ -127,3 +119,16 @@ ComboBox {
 .separator {
 	-fx-background-color: #4a494d;	
 }
+
+/************************************** Resizing style *********************************/
+
+
+
+
+
+
+
+
+
+
+
