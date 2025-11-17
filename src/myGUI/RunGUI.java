@@ -13,8 +13,9 @@ public class RunGUI extends Pane{
 	
 	private UserCoverPage userPage;
 	private TrackerPage trackerPage;
+	
 	public Stage primaryStage;
-	private String user;
+	public String user;
 	
 	public RunGUI(Stage primaryStage){
 		setStage(primaryStage);
@@ -30,9 +31,13 @@ public class RunGUI extends Pane{
 		this.getStyleClass().add("main-gui");
 	}
 
-	public void switchToTracker(String filePath) {
+	public void switchToTracker(String user) { 
+		this.user = user;
+		
 		// Create trackerPage
-	    trackerPage = new TrackerPage(this, filePath);
+	    trackerPage = new TrackerPage(this, user);
+	    
+	    // TODO: Wrap tracker with scroll pane
 	    
 	    // Clear GUI and set to TrackerPage
 	    this.getChildren().clear();
@@ -46,6 +51,8 @@ public class RunGUI extends Pane{
 	    
 	    // Set up style for tracker page
 		trackerPage.getStyleClass().add("tracker-page");
+		
+		// TODO: Unlock user resizing
 	}
 
 	public void switchToUser() {
@@ -57,10 +64,13 @@ public class RunGUI extends Pane{
 	    primaryStage.setWidth(USER_WIDTH);
 	    primaryStage.setHeight(USER_HEIGHT);
 	    primaryStage.centerOnScreen();
+	    
+	    // TODO: Lock user resizing
 	}
-
-	public String getUser() {return user;}
-	public void setUser(String user) {this.user = user;	}
+	
+	public String getUser() {
+		return user;
+	}
 	
 	public Stage getStage() {return primaryStage;}
 	public void setStage(Stage Stage) {this.primaryStage = Stage;	}

@@ -4,6 +4,7 @@ import budgetTracker.Budget;
 import budgetTracker.HistoryTable;
 
 import javafx.scene.control.Label;
+import javafx.scene.control.Separator;
 import javafx.scene.layout.VBox;
 
 import javafx.stage.Screen;
@@ -15,12 +16,11 @@ public class HistoryPane extends VBox{
 		
 		// TableView of transaction history
 		historyTable = new HistoryTable(budget);	
-		double maxWidth =Screen.getPrimary().getVisualBounds().getWidth()-100;
+		double maxWidth =Screen.getPrimary().getVisualBounds().getWidth()-100; // TODO: add dynamic resizing 
 		historyTable.setMaxWidth(maxWidth);
-		this.getChildren().add(historyTable);
 		
 		Label spacing = new Label("");
-		this.getChildren().add(spacing);
+		this.getChildren().addAll(new Separator(), spacing, historyTable);
 	}		
 	
 	public HistoryTable getHistoryTable() {

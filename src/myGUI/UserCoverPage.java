@@ -13,6 +13,7 @@ import javax.swing.JOptionPane;
 import budgetTracker.Budget;
 import budgetTracker.NewUser;
 import budgetTracker.Transaction;
+
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -69,7 +70,7 @@ public class UserCoverPage extends AnchorPane{
 		selectUserVbox = new HBox(5);
 		selectUserVbox.getChildren().addAll(selectUserCombo, enterButton);
 		
-		// New User Section
+		// New User Section 
 		Label fNameLabel = new Label("First Name:     ");
 		TextField fNameField = new TextField("");
 		HBox fNameHbox = new HBox(5);
@@ -140,9 +141,8 @@ public class UserCoverPage extends AnchorPane{
 			disableLogin(true);
 			
 			if (!selectedUser.equals("Username")) {
-				String filePath = filePaths.get(usernames.indexOf(selectedUser));
-				runGUI.setUser(selectedUser);
-				runGUI.switchToTracker(filePath);
+				String filePath = filePaths.get(usernames.indexOf(selectedUser)); // TODO: replace check usernames in SQL DB
+				runGUI.switchToTracker(selectedUser);
 			}
 		});
 		
@@ -228,8 +228,7 @@ public class UserCoverPage extends AnchorPane{
 		budget.transactions.add(initialTransaction);
 		budget.overwrite();
 		
-		runGUI.setUser(addUser.getFirst());
-		runGUI.switchToTracker(user.getFilePath());
+		runGUI.switchToTracker(addUser.getFirst());
 	}
 	
 	

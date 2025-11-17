@@ -5,24 +5,27 @@ import budgetTracker.Budget;
 import javafx.geometry.Insets;
 import javafx.geometry.Rectangle2D;
 
-import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.TilePane;
 
 import javafx.stage.Screen;
 
-public class TrackerPage extends BorderPane{
+public class TrackerPage extends TilePane{
 	public TitlePane titlePane;
 	
-	public TrackerPage(RunGUI runGUI, String filePath) {
+	public TrackerPage(RunGUI runGUI, String user) {
 		// Create budget
-		Budget budget = new Budget(filePath);
+		Budget budget = new Budget(user);
 		
 		// Get screen sizes to set max limits for each Pane
 		Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
 		double maxTitleHeight = screenBounds.getHeight() * 0.2; // TODO: hardcode into something else
 		
-		double screenWidth = screenBounds.getWidth(); // TODO: make dynamic on user resize
+		// Starting sizes
+		double screenWidth = screenBounds.getWidth(); 
 		double maxInputWidth = screenBounds.getWidth() * 0.2;
 		double maxChartWidth = screenBounds.getWidth() * 0.8;
+		
+		// TODO: add dynamic user resize
 		
 		// Padding
 		Insets titleInsets = new Insets(25,10,25,10);
@@ -36,6 +39,7 @@ public class TrackerPage extends BorderPane{
 		titlePane.setMaxWidth(screenWidth);
 		titlePane.setPrefWidth(screenWidth);
 		titlePane.setMaxHeight(maxTitleHeight);
+		titlePane.setPrefHeight(maxTitleHeight);
 		titlePane.getStyleClass().add("title-pane");
 		this.setTop(titlePane);
 		
@@ -50,8 +54,6 @@ public class TrackerPage extends BorderPane{
 		HistoryPane historyPane = new HistoryPane(budget);
 		historyPane.setPadding(historyInsets);		
 		historyPane.setMaxWidth(screenWidth);
-		historyPane.setMaxHeight(maxHistoryHeight);
-		historyPane.setPrefHeight(maxHistoryHeight);
 		historyPane.getStyleClass().add("history-pane");
 		
 		historyPane.getHistoryTable().setTitle(titlePane);

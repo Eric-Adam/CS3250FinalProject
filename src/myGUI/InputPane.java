@@ -60,6 +60,8 @@ public class InputPane extends VBox{
 				editTransactionButton,deleteTransactionButton);
 		this.getChildren().add(transactionButtons);
 		
+		// TODO: Replace disappearing field with a pop-up 
+		
 		// Add new transaction buttons/fields
 		// --- Income or expense field
 		Label newTransactionTypeLabel = new Label("Transaction Type:  ");

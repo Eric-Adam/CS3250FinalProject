@@ -43,10 +43,9 @@ public class Budget {
    		 "Miscellaneous"};
 	
 
-	public Budget(String filePath) {
+	public Budget(String user) { 
 		// Load data
-		this.filePath = filePath;
-		loadTransactions();		
+		loadTransactions(user);		
 	}	
 	
 	public String getFilePath() {
@@ -118,7 +117,7 @@ public class Budget {
     	return status;
     }
     
-    private void loadTransactions() {
+    private void loadTransactions() {// TODO: Update to pulling from SQL DB
 		// Pull data from CSV
 		List<String[]> transactionData = new ArrayList<>();
 
@@ -172,7 +171,7 @@ public class Budget {
  	    		value = value.replace(",", "");
  	    return value;
  	}
-    public void overwrite() {
+    public void overwrite() { // TODO: Update to SQL DB
     	File file = new File(filePath);
     	String[] header = {"transactionAmount","category","note","income","date"};
     	List<String> transStrings = new ArrayList<String>();
