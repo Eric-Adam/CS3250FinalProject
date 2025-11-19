@@ -43,9 +43,11 @@ public class Budget {
    		 "Miscellaneous"};
 	
 
-	public Budget(String user) { 
+	public Budget(String filePath) {
+		this.filePath = filePath;
+		
 		// Load data
-		loadTransactions(user);		
+		loadTransactions();		
 	}	
 	
 	public String getFilePath() {

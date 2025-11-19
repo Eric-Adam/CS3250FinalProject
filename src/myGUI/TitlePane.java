@@ -20,7 +20,7 @@ public class TitlePane extends AnchorPane{
 	private Label statusLabel = new Label();
 	
     
-	public TitlePane(RunGUI runGUI, Budget budget) {
+	public TitlePane(RunGUI runGUI, Budget budget) {// TODO: make anchors dynamic with window resize
 		this.budget = budget;
 		Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
 		
@@ -29,7 +29,7 @@ public class TitlePane extends AnchorPane{
 		Label welcomeLabel = new Label(welcomeMessage);
 		HBox  welcomeHBox = new HBox (welcomeLabel);
 		
-		double welcomeLeftAnchor = screenBounds.getWidth() / 2 - 100;
+		double welcomeLeftAnchor = screenBounds.getWidth() / 2 - 100; 
 		double welcomeTopAnchor = screenBounds.getHeight() * 0.05;
 		setLeftAnchor(welcomeHBox, welcomeLeftAnchor);
 		setTopAnchor(welcomeHBox, welcomeTopAnchor);

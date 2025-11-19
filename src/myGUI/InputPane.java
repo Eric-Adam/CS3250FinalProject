@@ -152,6 +152,10 @@ public class InputPane extends VBox{
 				disableEdit();
 				disableDelete();
 				
+				// TODO: Open dialog box for data input
+				
+				
+				
             	// Set to default
     			transactionCategory.setValue(Budget.categories[Budget.categories.length-1]);
     			newNoteField.setText("");
