@@ -1,25 +1,37 @@
 package budgetTracker;
-import java.io.*;
-import java.time.format.DateTimeFormatter;
+
 import java.time.LocalDate;
-import java.util.*;
-import javafx.beans.property.*;
+
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.StringProperty;
+
+import javafx.beans.property.SimpleBooleanProperty;
+import javafx.beans.property.SimpleDoubleProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
+
 
 public class Transaction{
-	/**
-	 * Changed private variables to Simple__Property to use TableView for history
-	 */
 	
 	// Unique for each transaction
 	private final IntegerProperty transactionID = new SimpleIntegerProperty();
+	
 	// Limited to positive and 2 decimals by GUI
     private final DoubleProperty transactionAmount = new SimpleDoubleProperty();
+    
     // For larger grouping of transactions (e.g. Household; Car)
     private final StringProperty category = new SimpleStringProperty();
+    
     // Small phrase for more specific details (e.g. towels, sheets; gas, oil change)
     private final StringProperty note = new SimpleStringProperty();
+    
     // True for income; false for expense
     private final BooleanProperty income = new SimpleBooleanProperty();
+    
     // Formatted as yyyy-mm-dd
     private final ObjectProperty<LocalDate> date = new SimpleObjectProperty<>();
     

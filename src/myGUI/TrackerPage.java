@@ -1,9 +1,12 @@
 package myGUI;
 
 import budgetTracker.Budget;
+
 import javafx.geometry.Insets;
 import javafx.geometry.Rectangle2D;
-import javafx.scene.layout.*;
+
+import javafx.scene.layout.BorderPane;
+
 import javafx.stage.Screen;
 
 public class TrackerPage extends BorderPane{
@@ -15,7 +18,7 @@ public class TrackerPage extends BorderPane{
 		
 		// Get screen sizes to set max limits for each Pane
 		Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
-		double maxTitleHeight = screenBounds.getHeight() * 0.2;
+		double maxTitleHeight = screenBounds.getHeight() * 0.1;
 		double maxHistoryHeight = screenBounds.getHeight() * 0.35;
 		double maxChartHeight = screenBounds.getHeight() * 0.4; 
 		
@@ -68,6 +71,7 @@ public class TrackerPage extends BorderPane{
 		inputPane.setHistoryTable(historyPane.getHistoryTable());
 		inputPane.setTitle(titlePane);
 		inputPane.setChart(chartPane);
+		inputPane.setStage(runGUI.getStage());
 		this.setLeft(inputPane);
 		
 		

@@ -21,3 +21,9 @@ transactionAmount,category,note,income,date
 10.73,Subscriptions,ShopTitans,false,2025-10-09
 11.81,Subscriptions,Pandora,false,2025-10-09
 2520.0,Salary,GI Bill,true,2025-10-11
+151.0,Miscellaneous,TEST,true,2025-11-01
+963.0,Miscellaneous,TEST,false,2025-11-03
+169.0,Miscellaneous,TEST,false,2025-11-05
+410.0,Miscellaneous,TEST,true,2025-11-07
+852.0,Miscellaneous,TEST,false,2025-11-09
+75.0,Miscellaneous,Test,true,2025-11-10

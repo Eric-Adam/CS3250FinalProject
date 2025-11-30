@@ -1,22 +1,35 @@
 package myGUI;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import javax.swing.JOptionPane;
 
 import budgetTracker.Budget;
 import budgetTracker.NewUser;
 import budgetTracker.Transaction;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
+import javafx.scene.Node;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.ComboBox;
+import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+
 import javafx.stage.Stage;
 
 public class UserCoverPage extends AnchorPane{
-	private final double WINDOW_WIDTH = 300.0;
 	private final double WINDOW_HEIGHT_START = 160.0;
 	private final double WINDOW_HEIGHT_LOGIN = 230.0;
 	private final double WINDOW_HEIGHT_NEW_USER = 350.0;
@@ -31,11 +44,9 @@ public class UserCoverPage extends AnchorPane{
 	private ToggleButton newUserButton;
 	
 	private HBox selectUserVbox;
+	private ArrayList<Node> nodeList = new ArrayList<>();
 	
-	private HBox fNameHbox;
-	private HBox lNameHbox;
-	private HBox initialValueHbox;
-	private Button submitUserButton;
+
 
 	public UserCoverPage(Stage primaryStage, RunGUI runGUI) {
 		// Load UserData
@@ -60,20 +71,24 @@ public class UserCoverPage extends AnchorPane{
 		// New User Section
 		Label fNameLabel = new Label("First Name:     ");
 		TextField fNameField = new TextField("");
-		fNameHbox = new HBox(5);
+		HBox fNameHbox = new HBox(5);
 		fNameHbox.getChildren().addAll(fNameLabel, fNameField);
+		nodeList.add(fNameHbox);
 		
 		Label lNameLabel = new Label("Last Name:      ");
 		TextField lNameField = new TextField("");
-		lNameHbox = new HBox(5);
+		HBox lNameHbox = new HBox(5);
 		lNameHbox.getChildren().addAll(lNameLabel, lNameField);
+		nodeList.add(lNameHbox);
 		
 		Label initialValueLabel = new Label("Intitial Value: $");
 		TextField initialValueField = new TextField("0.00");
-		initialValueHbox = new HBox(5);
+		HBox initialValueHbox = new HBox(5);
 		initialValueHbox.getChildren().addAll(initialValueLabel, initialValueField);
+		nodeList.add(initialValueHbox);
 		
-		submitUserButton = new Button("Submit");
+		Button submitUserButton = new Button("Submit");
+		nodeList.add(submitUserButton);
 		
 		// Put it all together
 		VBox centerVBox = new VBox(15);
@@ -156,7 +171,7 @@ public class UserCoverPage extends AnchorPane{
 			Boolean fNameFilled = !fNameField.getText().equals("");
 			Boolean lNameFilled = !lNameField.getText().equals("");
 			
-			@SuppressWarnings("unlikely-arg-type") // 
+			@SuppressWarnings("unlikely-arg-type") // Catch if the user emptied the field
 			Boolean initalAmountFilled = !initialValueField.equals("");
 			Boolean existingUser = false;
 			
@@ -196,31 +211,29 @@ public class UserCoverPage extends AnchorPane{
 		Transaction initialTransaction = new Transaction(user.getInitialAmount(), 
 				"Miscellaneous","Initial Transaction",true, today);
 
-		List<String> addUser = new ArrayList<String>();
+		ArrayList<String> addUser = new ArrayList<String>();
 		addUser.add(escapeForCSV(user.getFullName()));
 		addUser.add(escapeForCSV(user.getFilePath()));
 		
-		List<String> newUserData = new ArrayList<String>();
-		String[] headers = {"transactionAmount","category","note","income","date"};
-		Collections.addAll(newUserData, headers);
 		
-		// Open files
+		// Get users file path
 		File userFile = new File("src/resources/userData.csv");
-		File userDataFile = new File(user.getFilePath());
+		
+		// Add user to user file
+		saveToCSV(userFile, addUser);
 		
 		// Save data
-		saveToCSV(userFile, addUser);
-		saveToCSV(userDataFile, newUserData);
 		Budget budget = new Budget(user.getFilePath());
 		budget.transactions.add(initialTransaction);
+		budget.overwrite();
 		
 		runGUI.setUser(addUser.getFirst());
-		runGUI.switchToTracker(userDataFile.toString());
+		runGUI.switchToTracker(user.getFilePath());
 	}
 	
 	
 	// Appends to CSV
-	public static void saveToCSV(File file, List<String> arr) {			
+	public void saveToCSV(File file, ArrayList<String> arr) {			
 		try (FileWriter writer = new FileWriter(file, true)) {
 			for (int i = 0; i < arr.size(); i++) {
 		        writer.append(arr.get(i));
@@ -231,15 +244,21 @@ public class UserCoverPage extends AnchorPane{
 		    writer.append("\n");
 		    
 		} catch (IOException e) {
-			System.out.println("Failed to create file " + file.toString());
+			showAlert("Failed to create user.","User Creation Failed");
 		}
 	}
 	    
+	private void showAlert(String message, String title) {
+		Alert alert = new Alert(AlertType.NONE, message, ButtonType.OK);
+		alert.setTitle(title);
+		alert.initOwner(primaryStage);
+		alert.showAndWait();		
+	}
+
 	// Escapes double quotes and removes commas
 	private static String escapeForCSV(String value) {
-		if (value.contains(",") || value.contains("\"")) {
+		if (value.contains("\"")) {
 	        value = value.replace("\"", "\"\"");
-	        value = value.replace(",", "");
 	        return "\"" + value + "\"";
 	    }
 	    if (value.contains(","))
@@ -264,7 +283,7 @@ public class UserCoverPage extends AnchorPane{
             	count++;
             }           
         } catch (Exception e) {
-            System.out.println("Failed to load User data:\n"+e);
+            showAlert("Failed to load users","Load User Failed");
         }
 	}
 	
@@ -275,20 +294,15 @@ public class UserCoverPage extends AnchorPane{
 		
 		newUserButton.setSelected(enable);
 		
-		fNameHbox.setVisible(enable); 
-		lNameHbox.setVisible(enable); 
-		initialValueHbox.setVisible(enable); 
-		submitUserButton.setVisible(enable); 
-		
-		fNameHbox.setManaged(enable);
-		lNameHbox.setManaged(enable);
-		initialValueHbox.setManaged(enable);
-		submitUserButton.setManaged(enable);
+		for(Node node : nodeList) {
+			node.setVisible(enable);
+			node.setManaged(enable);
+		}
 		
 		if (enable)
-			resizeWindow(WINDOW_HEIGHT_NEW_USER, WINDOW_WIDTH);
+			resizeWindow(WINDOW_HEIGHT_NEW_USER);
 		else
-			resizeWindow(WINDOW_HEIGHT_START, WINDOW_WIDTH);		
+			resizeWindow(WINDOW_HEIGHT_START);		
 	}
 	
 	private void disableLogin(boolean disable) {
@@ -300,15 +314,15 @@ public class UserCoverPage extends AnchorPane{
 		selectUserVbox.setManaged(enable);
 		
 		if (enable)
-			resizeWindow(WINDOW_HEIGHT_LOGIN, WINDOW_WIDTH);
+			resizeWindow(WINDOW_HEIGHT_LOGIN);
 		else
-			resizeWindow(WINDOW_HEIGHT_START, WINDOW_WIDTH);
+			resizeWindow(WINDOW_HEIGHT_START);
 	}
 	
 	// Change window size to fit appearing/disappearing nodes
-	private void resizeWindow(double height, double width) {
-		primaryStage.setHeight(height);
-		primaryStage.setWidth(width);
+	private void resizeWindow(double height) {
+		primaryStage.setMaxHeight(height);
+		primaryStage.setMinHeight(height);
 	}
 
 }

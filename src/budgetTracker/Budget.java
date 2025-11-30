@@ -5,11 +5,14 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -161,9 +164,8 @@ public class Budget {
          
  	// Escapes double quotes and removes commas
  	private static String escapeForCSV(String value) {
- 	    if (value.contains(",") || value.contains("\"")) {
+ 	    if (value.contains("\"")) {
  	        value = value.replace("\"", "\"\"");
- 	        value = value.replace(",", "");
  	        return "\"" + value + "\"";
  	    }	
  	    if (value.contains(","))

@@ -6,7 +6,7 @@
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import myGUI.*;
+import myGUI.RunGUI;
 
 public class Main extends Application{
 	
