@@ -13,6 +13,7 @@ import javax.swing.JOptionPane;
 import budgetTracker.Budget;
 import budgetTracker.NewUser;
 import budgetTracker.Transaction;
+
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -27,32 +28,37 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
-import javafx.stage.Stage;
 
 public class UserCoverPage extends AnchorPane{
 	private final double WINDOW_HEIGHT_START = 160.0;
-	private final double WINDOW_HEIGHT_LOGIN = 230.0;
+	private final double WINDOW_HEIGHT_LOGIN = 230.0; // TODO: adjust once passwords are added
 	private final double WINDOW_HEIGHT_NEW_USER = 350.0;
 	
 	private String userFile = "src/resources/userData.csv";
 	private ArrayList<String> usernames = new ArrayList<String>();
 	private ArrayList<String> filePaths = new ArrayList<String>();
-	private Stage primaryStage;
+	private ArrayList<Node> nodeList = new ArrayList<>();
+	
 	private RunGUI runGUI;
 	
 	private ToggleButton loginButton;
 	private ToggleButton newUserButton;
 	
 	private HBox selectUserVbox;
-	private ArrayList<Node> nodeList = new ArrayList<>();
+	
 	
 
 
-	public UserCoverPage(Stage primaryStage, RunGUI runGUI) {
-		// Load UserData
+	public UserCoverPage(RunGUI runGUI) {
+		// Set defaults
+		setRunGUI(runGUI);
+				
+		// Load UserData // TODO: replace with pulling users from database
 		loadUserData();	
-		this.primaryStage = primaryStage;
-		this.runGUI = runGUI;
+		
+		
+		
+		// TODO: add password field and password hashing
 		
 		// Login Section
 		loginButton = new ToggleButton("Login");
@@ -139,9 +145,7 @@ public class UserCoverPage extends AnchorPane{
 			disableLogin(true);
 			
 			if (!selectedUser.equals("Username")) {
-				String filePath = filePaths.get(usernames.indexOf(selectedUser));
-				runGUI.setUser(selectedUser);
-				runGUI.switchToTracker(filePath);
+				runGUI.switchToTracker(selectedUser);
 			}
 		});
 		
@@ -202,7 +206,7 @@ public class UserCoverPage extends AnchorPane{
 		});
 	}
 	
-	// Creates new user
+	// Creates new user // TODO: update to SQL database insert
 	private void createNewUser(Double initialAmount, String fName, String lName) {
 		
 		NewUser user = new NewUser(fName, lName, initialAmount);
@@ -227,7 +231,6 @@ public class UserCoverPage extends AnchorPane{
 		budget.transactions.add(initialTransaction);
 		budget.overwrite();
 		
-		runGUI.setUser(addUser.getFirst());
 		runGUI.switchToTracker(user.getFilePath());
 	}
 	
@@ -251,7 +254,7 @@ public class UserCoverPage extends AnchorPane{
 	private void showAlert(String message, String title) {
 		Alert alert = new Alert(AlertType.NONE, message, ButtonType.OK);
 		alert.setTitle(title);
-		alert.initOwner(primaryStage);
+		alert.initOwner(runGUI.primaryStage);
 		alert.showAndWait();		
 	}
 
@@ -321,8 +324,14 @@ public class UserCoverPage extends AnchorPane{
 	
 	// Change window size to fit appearing/disappearing nodes
 	private void resizeWindow(double height) {
-		primaryStage.setMaxHeight(height);
-		primaryStage.setMinHeight(height);
+		runGUI.primaryStage.setMaxHeight(height);
+		runGUI.primaryStage.setMinHeight(height);
 	}
+
+
+	private void setRunGUI(RunGUI runGUI) {
+		this.runGUI = runGUI;
+	}
+
 
 }

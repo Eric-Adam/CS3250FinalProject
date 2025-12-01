@@ -71,5 +71,5 @@ public class Transaction{
     public LocalDate getDate() { return date.get(); }
     public void setDate(LocalDate date) { this.date.set(date); }
     public ObjectProperty<LocalDate> dateProperty() { return date; }
-
 }
+

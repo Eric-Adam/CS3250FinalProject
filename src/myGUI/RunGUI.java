@@ -1,5 +1,8 @@
 package myGUI;
 
+import java.sql.SQLException;
+
+import budgetTracker.MyDatabase;
 import javafx.geometry.Rectangle2D;
 
 import javafx.scene.layout.Pane;
@@ -17,15 +20,23 @@ public class RunGUI extends Pane{
 	
 	private UserCoverPage userPage;
 	private TrackerPage trackerPage;
-	private String user;
+	private MyDatabase db;
 	
 	public Stage primaryStage;
 	
 	public RunGUI(Stage primaryStage){
 		setStage(primaryStage);
+		
+		// Create Database
+		try {
+			this.db = new MyDatabase("myData.db");
+		} catch (SQLException e) {
+			System.out.println("No database found.");
+			e.printStackTrace();
+		}
 			
 		// Create Cover Page
-		userPage = new UserCoverPage(primaryStage, this);
+		userPage = new UserCoverPage(this);
 
 		// Set User Page First
 		switchToUser();
@@ -35,9 +46,9 @@ public class RunGUI extends Pane{
 		this.getStyleClass().add("main-gui");
 	}
 
-	public void switchToTracker(String filePath) {
+	public void switchToTracker(String name) {
 		// Create trackerPage
-	    trackerPage = new TrackerPage(this, filePath);
+	    trackerPage = new TrackerPage(this, name);
 	    
 	    // Clear GUI and set to TrackerPage
 	    this.getChildren().clear();
@@ -69,11 +80,16 @@ public class RunGUI extends Pane{
 	    primaryStage.setMinHeight(USER_HEIGHT);
 	    primaryStage.centerOnScreen();
 	}
-
-	public String getUser() {return user;}
-	public void setUser(String user) {this.user = user;	}
 	
 	public Stage getStage() {return primaryStage;}
 	public void setStage(Stage Stage) {this.primaryStage = Stage;	}
+
+	public MyDatabase getDB() {
+		return db;
+	}
+
+	public void setDB(MyDatabase db) {
+		this.db = db;
+	}
 	
 }

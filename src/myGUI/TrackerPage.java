@@ -1,7 +1,6 @@
 package myGUI;
 
 import budgetTracker.Budget;
-
 import javafx.geometry.Insets;
 import javafx.geometry.Rectangle2D;
 
@@ -12,9 +11,9 @@ import javafx.stage.Screen;
 public class TrackerPage extends BorderPane{
 	public TitlePane titlePane;
 	
-	public TrackerPage(RunGUI runGUI, String filePath) {
+	public TrackerPage(RunGUI runGUI, String name) {
 		// Create budget
-		Budget budget = new Budget(filePath);
+		Budget budget = new Budget(runGUI.getDB(), name);
 		
 		// Get screen sizes to set max limits for each Pane
 		Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
