@@ -19,10 +19,12 @@ public class RunGUI extends Pane{
 	private double trackerHeight = screenBounds.getHeight();
 	
 	private UserCoverPage userPage;
-	private TrackerPage trackerPage;
+	public TrackerPage trackerPage;
 	private MyDatabase db;
 	
 	public Stage primaryStage;
+	public String username;
+	
 	
 	public RunGUI(Stage primaryStage){
 		setStage(primaryStage);
@@ -48,6 +50,7 @@ public class RunGUI extends Pane{
 
 	public void switchToTracker(String name) {
 		// Create trackerPage
+		setUsername(name);
 	    trackerPage = new TrackerPage(this, name);
 	    
 	    // Clear GUI and set to TrackerPage
@@ -90,6 +93,14 @@ public class RunGUI extends Pane{
 
 	public void setDB(MyDatabase db) {
 		this.db = db;
+	}
+	
+	public String getUsername(){
+		return this.username;
+	}
+
+	public void setUsername(String name) {
+		this.username = name;
 	}
 	
 }

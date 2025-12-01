@@ -135,8 +135,9 @@ public class Budget {
     	return status;
     }
     
-    // TODO: Remove? Obsolete due to using database instead of CSV files
+
     // Load transactions from CSV file
+    @Deprecated
     private void loadTransactions() {
 		// Pull data from CSV
 		List<String[]> transactionData = new ArrayList<>();
@@ -187,33 +188,34 @@ public class Budget {
 		String sql = "SELECT Amount, Category, Note, Income, Date \r\n"
 				+ "FROM Transactions\r\n"
 				+ "WHERE owner = '" + name + "'\r\n"
-				+ "ORDER by Date DESC;";	
+				+ "ORDER by Date ASC;";	
 		
 		// Pull transactions from database
-		try (Connection conn = db.getConnection();
-		        Statement stmt = conn.createStatement();
-		        ResultSet rs = stmt.executeQuery(sql)) {
+		try {
+			Connection conn = db.getConnection();
+	        Statement stmt = conn.createStatement();
+	        ResultSet rs = stmt.executeQuery(sql);
+	        
+			double amount;
+			String category, note;
+			Boolean income;
+			LocalDate date;
 			
-				double amount;
-				String category, note;
-				Boolean income;
-				LocalDate date;
-				
-		        while (rs.next()) {
-		        	amount   = rs.getDouble("Amount");
-		            category = rs.getString("Category");
-		            note     = rs.getString("Note");
-		            income   = (rs.getInt("Income")==1) ? true: false;
-		            date     = LocalDate.parse(rs.getString("Date"));
-		            
-		            // Add transactions to observable list
-		            transactions.add(new Transaction(amount, category, note, income, date));
-		        }
-
-		    } catch (Exception e) {
-		    	System.out.println("Failed to load transaction from database");
-		        e.printStackTrace();
-		    }
+	        while (rs.next()) {
+	        	amount   = rs.getDouble("Amount");
+	            category = rs.getString("Category");
+	            note     = rs.getString("Note");
+	            income   = (rs.getInt("Income")==1) ? true: false;
+	            date     = LocalDate.parse(rs.getString("Date"));
+	            
+	            // Add transactions to observable list
+	            transactions.add(new Transaction(amount, category, note, income, date));
+	        }
+	        
+		} catch (Exception e) {
+	    	System.out.println("Failed to load transaction from database");
+	        e.printStackTrace();
+	    }
 		
 		fillIncomeExpense();
 	}
@@ -227,8 +229,8 @@ public class Budget {
     	getTransactions();
     }
          
-	// TODO: Remove? Obsolete due to using database instead of CSV files
  	// Escapes double quotes and removes commas 
+    @Deprecated
  	private static String escapeForCSV(String value) {
  	    if (value.contains("\"")) {
  	        value = value.replace("\"", "\"\"");
@@ -239,7 +241,9 @@ public class Budget {
  	    return value;
  	}
  	
- 	// TODO: Remove? Obsolete due to using database instead of CSV files
+    
+    // Overwrites CSV file for editing and deleting transactions
+    @Deprecated
     public void overwrite() {
     	File file = new File(filePath);
     	String[] header = {"transactionAmount","category","note","income","date"};
@@ -294,4 +298,41 @@ public class Budget {
 	public void setName(String name) {
 		this.name = name;
 	}
+	
+	// TODO: Add new transaction to database
+	public static void addTransaction(Transaction transaction) {
+		int income = transaction.isIncome()? 1:0;
+		
+		// SQL statement for adding transaction
+		String sqlTransaction = "INSERT INTO Transactions (Amount, Category, Note, Income, Date, Owner)\r\n"
+				+ "VALUES ("+ transaction.getTransactionAmount() 
+				++",'"
+				++"','"
+				++"','"
+				++"','"
+				+ today + "','"+user.getFullName()+"');";	
+				
+				
+		// Push new user data to database
+		try {
+			Connection conn = runGUI.getDB().getConnection();
+	        Statement stmt = conn.createStatement();
+
+	        stmt.execute(sqlName);
+	        stmt.execute(sqlTransaction);
+			
+	        pullUserData();
+	        
+		} catch (Exception e) {
+	    	System.out.println("Failed to add new user to database");
+	        e.printStackTrace();
+	    }
+	}
+	
+	
+	// TODO: Edit transaction in database
+	
+	// TODO: Remove transaction from database
+	
+	
 }

@@ -10,8 +10,11 @@ import javafx.stage.Screen;
 
 public class TrackerPage extends BorderPane{
 	public TitlePane titlePane;
+	public String name;
 	
 	public TrackerPage(RunGUI runGUI, String name) {
+		setName(name);
+		
 		// Create budget
 		Budget budget = new Budget(runGUI.getDB(), name);
 		
@@ -71,8 +74,13 @@ public class TrackerPage extends BorderPane{
 		inputPane.setTitle(titlePane);
 		inputPane.setChart(chartPane);
 		inputPane.setStage(runGUI.getStage());
-		this.setLeft(inputPane);
-		
-		
+		this.setLeft(inputPane);	
+	}
+	
+	public String getName() {
+		return this.name;
+	}
+	public void setName(String name) {
+		this.name = name;
 	}
 }

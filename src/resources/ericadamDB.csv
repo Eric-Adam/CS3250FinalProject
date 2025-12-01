@@ -27,3 +27,5 @@ transactionAmount,category,note,income,date
 410.0,Miscellaneous,TEST,true,2025-11-07
 852.0,Miscellaneous,TEST,false,2025-11-09
 75.0,Miscellaneous,Test,true,2025-11-10
+15.0,Miscellaneous,,true,2025-11-12
+516.0,Miscellaneous,dialog test,true,2025-11-30

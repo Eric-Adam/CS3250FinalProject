@@ -25,7 +25,7 @@ public class TitlePane extends AnchorPane{
 		Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
 		
 		// Main Title
-		String welcomeMessage = "------ Welcome "+runGUI.getUser()+" ------";
+		String welcomeMessage = "------ Welcome " + runGUI.getUsername() + " ------";
 		Label welcomeLabel = new Label(welcomeMessage);
 		HBox  welcomeHBox = new HBox (welcomeLabel);
 		

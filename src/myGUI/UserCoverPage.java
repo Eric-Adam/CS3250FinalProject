@@ -5,14 +5,14 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-
+import java.sql.Connection;
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import javax.swing.JOptionPane;
 
-import budgetTracker.Budget;
 import budgetTracker.NewUser;
-import budgetTracker.Transaction;
 
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
@@ -43,22 +43,15 @@ public class UserCoverPage extends AnchorPane{
 	
 	private ToggleButton loginButton;
 	private ToggleButton newUserButton;
-	
 	private HBox selectUserVbox;
 	
-	
-
 
 	public UserCoverPage(RunGUI runGUI) {
-		// Set defaults
 		setRunGUI(runGUI);
 				
-		// Load UserData // TODO: replace with pulling users from database
-		loadUserData();	
+		// Load users 
+		pullUserData();	
 		
-		
-		
-		// TODO: add password field and password hashing
 		
 		// Login Section
 		loginButton = new ToggleButton("Login");
@@ -74,6 +67,8 @@ public class UserCoverPage extends AnchorPane{
 		selectUserVbox = new HBox(5);
 		selectUserVbox.getChildren().addAll(selectUserCombo, enterButton);
 		
+		// TODO: add password field and password hashing if I have time
+		
 		// New User Section
 		Label fNameLabel = new Label("First Name:     ");
 		TextField fNameField = new TextField("");
@@ -86,6 +81,8 @@ public class UserCoverPage extends AnchorPane{
 		HBox lNameHbox = new HBox(5);
 		lNameHbox.getChildren().addAll(lNameLabel, lNameField);
 		nodeList.add(lNameHbox);
+		
+		// TODO: add password field and password hashing if I have time
 		
 		Label initialValueLabel = new Label("Intitial Value: $");
 		TextField initialValueField = new TextField("0.00");
@@ -119,7 +116,7 @@ public class UserCoverPage extends AnchorPane{
 				disableLogin(false);
 				
 				// Set default values
-				loadUserData();
+				pullUserData();
 				selectUserCombo.getItems().setAll(usernames);
 				selectUserCombo.setValue("Username");
 
@@ -210,32 +207,65 @@ public class UserCoverPage extends AnchorPane{
 	private void createNewUser(Double initialAmount, String fName, String lName) {
 		
 		NewUser user = new NewUser(fName, lName, initialAmount);
-		
 		LocalDate today = LocalDate.now();
-		Transaction initialTransaction = new Transaction(user.getInitialAmount(), 
-				"Miscellaneous","Initial Transaction",true, today);
+		
+		// No longer in use due to the switch to SQL database
+//		Transaction initialTransaction = new Transaction(user.getInitialAmount(), 
+//				"Miscellaneous","Initial Transaction",true, today);
+//
+//		ArrayList<String> addUser = new ArrayList<String>();
+//		addUser.add(escapeForCSV(user.getFullName()));
+//		addUser.add(escapeForCSV(user.getFilePath()));
+//		
+//		
+//		// Get users file path
+//		File userFile = new File("src/resources/userData.csv");
+//		
+//		// Add user to user file
+//		saveToCSV(userFile, addUser);
+//		
+//		// Save data
+//		Budget budget = new Budget(user.getFilePath());
+//		budget.transactions.add(initialTransaction);
+//		budget.overwrite();
+		
+		
+		
+		// SQL statement for inserting user name
+		String sqlName = "INSERT INTO UserList (Name)\r\n"
+				+ "VALUES ('"+ user.getFullName() +"');";	
+		
+		// SQL statement for adding initial transaction
+		String sqlTransaction = "INSERT INTO Transactions (Amount, Category, Note, Income, Date, Owner)\r\n"
+				+ "VALUES ("+ user.getInitialAmount() + 
+				", 'Miscellaneous','Initial Transaction',1, '"
+				+ today + "','"+user.getFullName()+"');";	
+				
+				
+		// Push new user data to database
+		try {
+			Connection conn = runGUI.getDB().getConnection();
+	        Statement stmt = conn.createStatement();
 
-		ArrayList<String> addUser = new ArrayList<String>();
-		addUser.add(escapeForCSV(user.getFullName()));
-		addUser.add(escapeForCSV(user.getFilePath()));
+	        stmt.execute(sqlName);
+	        stmt.execute(sqlTransaction);
+			
+	        pullUserData();
+	        
+		} catch (Exception e) {
+	    	System.out.println("Failed to add new user to database");
+	        e.printStackTrace();
+	    }
 		
+		// Switch to tracker page
+		if (usernames.contains(user.getFullName()))
+			runGUI.switchToTracker(user.getFullName());
 		
-		// Get users file path
-		File userFile = new File("src/resources/userData.csv");
-		
-		// Add user to user file
-		saveToCSV(userFile, addUser);
-		
-		// Save data
-		Budget budget = new Budget(user.getFilePath());
-		budget.transactions.add(initialTransaction);
-		budget.overwrite();
-		
-		runGUI.switchToTracker(user.getFilePath());
 	}
 	
 	
 	// Appends to CSV
+	@Deprecated
 	public void saveToCSV(File file, ArrayList<String> arr) {			
 		try (FileWriter writer = new FileWriter(file, true)) {
 			for (int i = 0; i < arr.size(); i++) {
@@ -257,8 +287,9 @@ public class UserCoverPage extends AnchorPane{
 		alert.initOwner(runGUI.primaryStage);
 		alert.showAndWait();		
 	}
-
+	
 	// Escapes double quotes and removes commas
+	@Deprecated
 	private static String escapeForCSV(String value) {
 		if (value.contains("\"")) {
 	        value = value.replace("\"", "\"\"");
@@ -270,6 +301,7 @@ public class UserCoverPage extends AnchorPane{
 	    return value;
 	}
 	
+	@Deprecated
 	private void loadUserData() {
 		usernames.clear();
 		filePaths.clear();
@@ -290,6 +322,37 @@ public class UserCoverPage extends AnchorPane{
         }
 	}
 	
+	// Load users from database
+	private void pullUserData() {
+		usernames.clear();
+		
+		// SQL statement for selecting user names TODO: replace UserList w/ Users if passwords are functional
+		String sql = "SELECT Name \r\n"
+				+ "FROM UserList\r\n"
+				+ "ORDER by Name ASC;";	
+				
+				
+		// Pull user data from database
+		try {
+			Connection conn = runGUI.getDB().getConnection();
+	        Statement stmt = conn.createStatement();
+	        ResultSet rs = stmt.executeQuery(sql);
+	        
+			String username;
+			
+	        while (rs.next()) {
+	        	username = rs.getString("Name");
+	            
+	            // Add names to usernames list
+	            usernames.add(username);
+	            // TODO: Add hashed passwords to a list if passwords are functional
+	        }
+	        
+		} catch (Exception e) {
+	    	System.out.println("Failed to load users from database");
+	        e.printStackTrace();
+	    }
+	}
 	
 	// Make sections appear and disappear	
 	private void disableNewUser(boolean disable) {
