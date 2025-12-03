@@ -2,10 +2,11 @@ package budgetTracker;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-
+import javafx.collections.transformation.SortedList;
 import javafx.geometry.Side;
 
 import javafx.scene.chart.BarChart;
@@ -68,8 +69,12 @@ public class BuildCharts extends Pane{
         // Prepare data
         XYChart.Series<String, Number> lineSeries = new XYChart.Series<>();
         XYChart.Data<String, Number> lastData = null;
+        
+        // Reverse order for transactions to correct date axis
+        ObservableList<Transaction> reversedList  = FXCollections.observableArrayList(budget.transactions);
+        FXCollections.reverse(reversedList);
 
-        for (Transaction transaction : budget.transactions) {
+        for (Transaction transaction : reversedList) {
 			if(transaction.getDate().isAfter(startDate)) {
 				// Format date to MM-dd and keep as string
 				date = transaction.getDate().format(formatter).toString();

@@ -1,12 +1,11 @@
 package budgetTracker;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
@@ -15,24 +14,34 @@ import java.time.format.DateTimeFormatter;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-public class Budget {
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Alert.AlertType;
+
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
+
+import myGUI.RunGUI;
+
+public class Budget {	
 	private ArrayList<Transaction> income = new ArrayList<Transaction>();
 	private ArrayList<Transaction> expenses = new ArrayList<Transaction>();
-	private String filePath;
 	private String name;
 	
-	public ObservableList<Transaction> transactions = FXCollections.observableArrayList();
-	public MyDatabase db;
+	public  ObservableList<Transaction> transactions = FXCollections.observableArrayList();
+	public static ObservableList<Transaction> staticTransactions = FXCollections.observableArrayList();
 	
+	private static Stage primaryStage;
+	
+	public static MyDatabase db;
 	public static final String[] incomeCategories = 
 			{"Gifts","Household","Insurance","Loan","Retirement",
 			 "Salary","Transfer","Miscellaneous"};
-	
 	public static final String[] expenseCategories = 
 		{"Books","Car","Clothing","Credit Card","Entertainment",
 		 "Events","Gifts","Groceries","Health","Household",
@@ -40,7 +49,6 @@ public class Budget {
 		 "Phone","Rent","Retirement","Savings","School",
 		 "Spouse","Subscriptions","Takeout/Delivery",
 		 "Transfer","Travel/Transport","Utilities","Miscellaneous"};
-	
 	public static final String[] categories = 
 		{"Books","Car","Clothing","Credit Card","Entertainment",
    		 "Events","Gifts","Groceries","Health","Household","Insurance",
@@ -50,26 +58,29 @@ public class Budget {
    		 "Miscellaneous"};
 	
 	// Original constructor using CSV files
-	public Budget(String filePath) {
-		// Load data
-		this.filePath = filePath;
-		loadTransactions();		
-	}	
+//	@Deprecated
+//	public Budget(String filePath) {
+//		// Load data
+//		this.filePath = filePath;
+//		loadTransactions();		
+//	}	
 	
 	// New constructor utilizing SQL database
-	public Budget(MyDatabase db, String name) {
-		setDB(db);
+	public Budget(RunGUI runGUI, String name) {
+		setDB(runGUI.getDB());
 		setName(name);
+		setStage(runGUI.primaryStage);
 		getTransactions();
 	}
 
-	
 	public void setDB(MyDatabase db) {
-		this.db = db;
+		Budget.db = db;
 	}
-	public String getFilePath() {
-		return this.filePath;
-	}
+	
+//	@Deprecated
+//	public String getFilePath() {
+//		return this.filePath;
+//	}
 
     public double getOverallBalance() {
     	double balance = 0;
@@ -137,35 +148,35 @@ public class Budget {
     
 
     // Load transactions from CSV file
-    @Deprecated
-    private void loadTransactions() {
-		// Pull data from CSV
-		List<String[]> transactionData = new ArrayList<>();
-
-        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
-            String line;
-
-            while ((line = br.readLine()) != null) {
-                String[] values = line.split(",");
-                transactionData.add(values); 
-            }
-        } catch (Exception e) {
-            System.out.println("Failed to load CSV data:\n" + e);
-        }
+//    @Deprecated
+//    private void loadTransactions() {
+//		// Pull data from CSV
+//		List<String[]> transactionData = new ArrayList<>();
+//
+//        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
+//            String line;
+//
+//            while ((line = br.readLine()) != null) {
+//                String[] values = line.split(",");
+//                transactionData.add(values); 
+//            }
+//        } catch (Exception e) {
+//            System.out.println("Failed to load CSV data:\n" + e);
+//        }
 		
 		// Convert data to Transaction objects
-		List<Transaction> transactionList = transactionData.stream()
-		    .skip(1) // skip header
-		    .map(row -> new Transaction(Double.parseDouble(row[0]), 
-		    							row[1], 
-		    							row[2], 
-		    							Boolean.parseBoolean(row[3]), 
-		    							LocalDate.parse(row[4])))
-		    .collect(Collectors.toList());
-		transactions.setAll(transactionList);
-		
-		fillIncomeExpense();
-	}
+//		List<Transaction> transactionList = transactionData.stream()
+//		    .skip(1) // skip header
+//		    .map(row -> new Transaction(Double.parseDouble(row[0]), 
+//		    							row[1], 
+//		    							row[2], 
+//		    							Boolean.parseBoolean(row[3]), 
+//		    							LocalDate.parse(row[4])))
+//		    .collect(Collectors.toList());
+//		transactions.setAll(transactionList);
+//		
+//		fillIncomeExpense();
+//	}
 	
     // Fill income/expense lists
 	private void fillIncomeExpense() {
@@ -185,10 +196,10 @@ public class Budget {
 		transactions.clear();
 		
 		// SQL statement for selecting transactions
-		String sql = "SELECT Amount, Category, Note, Income, Date \r\n"
+		String sql = "SELECT Amount, Category, Note, Income, Date, ID \r\n"
 				+ "FROM Transactions\r\n"
 				+ "WHERE owner = '" + name + "'\r\n"
-				+ "ORDER by Date ASC;";	
+				+ "ORDER by Date DESC;";	
 		
 		// Pull transactions from database
 		try {
@@ -200,6 +211,7 @@ public class Budget {
 			String category, note;
 			Boolean income;
 			LocalDate date;
+			int id;
 			
 	        while (rs.next()) {
 	        	amount   = rs.getDouble("Amount");
@@ -207,9 +219,10 @@ public class Budget {
 	            note     = rs.getString("Note");
 	            income   = (rs.getInt("Income")==1) ? true: false;
 	            date     = LocalDate.parse(rs.getString("Date"));
+	            id       = rs.getInt("ID");
 	            
 	            // Add transactions to observable list
-	            transactions.add(new Transaction(amount, category, note, income, date));
+	            transactions.add(new Transaction(amount, category, note, income, date, id));
 	        }
 	        
 		} catch (Exception e) {
@@ -224,14 +237,13 @@ public class Budget {
     	// Clear old data and reload
     	income.clear();
     	expenses.clear();
-    	transactions.clear();
+    	
 //      loadTransactions();
     	getTransactions();
     }
          
  	// Escapes double quotes and removes commas 
-    @Deprecated
- 	private static String escapeForCSV(String value) {
+    private static String escapeForCSV(String value) {
  	    if (value.contains("\"")) {
  	        value = value.replace("\"", "\"\"");
  	        return "\"" + value + "\"";
@@ -243,53 +255,53 @@ public class Budget {
  	
     
     // Overwrites CSV file for editing and deleting transactions
-    @Deprecated
-    public void overwrite() {
-    	File file = new File(filePath);
-    	String[] header = {"transactionAmount","category","note","income","date"};
-    	List<String> transStrings = new ArrayList<String>();
-    	DateTimeFormatter  formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-    	
-    	// Add header - Overwrites file
-    	try (FileWriter writer = new FileWriter(file, false)) {
- 			for (int i = 0; i < header.length; i++) {
- 		        writer.append(header[i]);
- 		        if (i < header.length - 1) {
- 		            writer.append(",");
- 		        }
- 		    }
- 		    writer.append("\n");
- 		    
- 		} catch (IOException e) {
- 			System.out.println("Failed to write to file");
- 		}
-    	
-    	// Sort transactions by date
-    	FXCollections.sort(transactions, (t1, t2) -> t1.getDate().compareTo(t2.getDate()));
-    	
-    	// Add transactions back to file
-    	for (Transaction trans : transactions) {
-    		transStrings.clear();
-    		transStrings.add(Double.toString(trans.getTransactionAmount()));
-    		transStrings.add(escapeForCSV(trans.getCategory()));
-    		transStrings.add(escapeForCSV(trans.getNote()));
-    		transStrings.add(Boolean.toString(trans.isIncome()));
-	 		transStrings.add(formatter.format(trans.getDate()));
- 		
-	 		try (FileWriter writer = new FileWriter(file, true)) {
-				for (int i = 0; i < transStrings.size(); i++) {
-			        writer.append(transStrings.get(i));
-			        if (i < transStrings.size() - 1) {
-			            writer.append(",");
-			        }
-			    }
-			    writer.append("\n");
-			    
-			} catch (IOException e) {
-				System.out.println("Failed to write transaction to file");
-			}
-    	}
-    }
+//    @Deprecated
+//    public void overwrite() {
+//    	File file = new File(filePath);
+//    	String[] header = {"transactionAmount","category","note","income","date"};
+//    	List<String> transStrings = new ArrayList<String>();
+//    	DateTimeFormatter  formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+//    	
+//    	// Add header - Overwrites file
+//    	try (FileWriter writer = new FileWriter(file, false)) {
+// 			for (int i = 0; i < header.length; i++) {
+// 		        writer.append(header[i]);
+// 		        if (i < header.length - 1) {
+// 		            writer.append(",");
+// 		        }
+// 		    }
+// 		    writer.append("\n");
+// 		    
+// 		} catch (IOException e) {
+// 			System.out.println("Failed to write to file");
+// 		}
+//    	
+//    	// Sort transactions by date
+//    	FXCollections.sort(transactions, (t1, t2) -> t1.getDate().compareTo(t2.getDate()));
+//    	
+//    	// Add transactions back to file
+//    	for (Transaction trans : transactions) {
+//    		transStrings.clear();
+//    		transStrings.add(Double.toString(trans.getTransactionAmount()));
+//    		transStrings.add(escapeForCSV(trans.getCategory()));
+//    		transStrings.add(escapeForCSV(trans.getNote()));
+//    		transStrings.add(Boolean.toString(trans.isIncome()));
+//	 		transStrings.add(formatter.format(trans.getDate()));
+// 		
+//	 		try (FileWriter writer = new FileWriter(file, true)) {
+//				for (int i = 0; i < transStrings.size(); i++) {
+//			        writer.append(transStrings.get(i));
+//			        if (i < transStrings.size() - 1) {
+//			            writer.append(",");
+//			        }
+//			    }
+//			    writer.append("\n");
+//			    
+//			} catch (IOException e) {
+//				System.out.println("Failed to write transaction to file");
+//			}
+//    	}
+//    }
 
 	public String getName() {
 		return name;
@@ -299,40 +311,168 @@ public class Budget {
 		this.name = name;
 	}
 	
-	// TODO: Add new transaction to database
-	public static void addTransaction(Transaction transaction) {
+	// Add new transaction to database
+	public static void addTransaction(Transaction transaction, String owner) {
 		int income = transaction.isIncome()? 1:0;
 		
 		// SQL statement for adding transaction
 		String sqlTransaction = "INSERT INTO Transactions (Amount, Category, Note, Income, Date, Owner)\r\n"
-				+ "VALUES ("+ transaction.getTransactionAmount() 
-				++",'"
-				++"','"
-				++"','"
-				++"','"
-				+ today + "','"+user.getFullName()+"');";	
+				+ String.format("VALUES (%.2f, '%s', '%s', %d, '%s', '%s');",
+						transaction.getTransactionAmount(),
+						transaction.getCategory(),
+						transaction.getNote(),
+						income,
+						transaction.getDate().toString(),
+						owner);	
 				
 				
-		// Push new user data to database
+		// Push new transaction to database
 		try {
-			Connection conn = runGUI.getDB().getConnection();
+			Connection conn = db.getConnection();
 	        Statement stmt = conn.createStatement();
 
-	        stmt.execute(sqlName);
 	        stmt.execute(sqlTransaction);
 			
-	        pullUserData();
 	        
 		} catch (Exception e) {
-	    	System.out.println("Failed to add new user to database");
+	    	System.out.println("Failed to add transaction to database");
 	        e.printStackTrace();
 	    }
 	}
 	
 	
-	// TODO: Edit transaction in database
+	// Edit transaction in database
+	public static void editTransaction(Transaction transaction) {
+		int income = transaction.isIncome()? 1:0;
+				
+		// SQL statement for editing a transaction
+		String sqlEdit = "UPDATE Transactions \r\n"
+				+"SET Amount = ?, Category = ?, Note = ?, Income = ?, Date = ? \r\n"
+				+"WHERE ID = ?";
 	
-	// TODO: Remove transaction from database
 	
+		// Push new transaction to database
+		try {
+			Connection conn = db.getConnection();
+		    PreparedStatement stmt = conn.prepareStatement(sqlEdit);
+		    
+		    stmt.setDouble(1, transaction.getTransactionAmount());
+		    stmt.setString(2, transaction.getCategory());
+		    stmt.setString(3, transaction.getNote());
+		    stmt.setInt(4, income);
+		    stmt.setString(5, transaction.getDate().toString());
+		    stmt.setInt(6, transaction.getId());
+		
+		    stmt.executeUpdate();
+			
+		    
+		} catch (Exception e) {
+			System.out.println("Failed to edit transaction");
+		    e.printStackTrace();
+		}
+		
+	}
+	
+	// Remove transaction from database
+	public static void deleteTransaction(Transaction transaction) {
+				
+		// SQL statement for deleting a transaction
+		String sqlDelete = "DELETE FROM Transactions \r\n"
+				+String.format("WHERE ID = %d", transaction.getId());
+	
+		// Push deletion to database
+		try {
+			Connection conn = db.getConnection();
+		    Statement stmt = conn.createStatement();
+
+		    stmt.execute(sqlDelete);	
+		    
+		} catch (Exception e) {
+			System.out.println("Failed to edit transaction");
+		    e.printStackTrace();
+		}
+		
+	}
+
+	// Exports static transaction list to CSV file
+	public static void exportCSV() {
+		// Set necessary variables
+		String[] header = {"transactionAmount","category","note","income","date"};
+    	List<String> transStrings = new ArrayList<String>();
+    	DateTimeFormatter  formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+		
+		// Let user select location and name
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.setTitle("Save File");
+        fileChooser.setInitialFileName("Transactions.csv");
+        fileChooser.setInitialDirectory(new File(System.getProperty("user.home"), "Desktop"));
+        fileChooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("CSV File", "*.csv")
+            );
+        
+		try {
+			File file = fileChooser.showSaveDialog(primaryStage);
+	    	
+	    	// Catch user cancellation
+	    	if (file == null) 
+	    		return;
+	    	
+	    	// Add header
+	    	FileWriter writer = new FileWriter(file, false);
+			for (int i = 0; i < header.length; i++) {
+		        writer.append(header[i]);
+		        if (i < header.length - 1) {
+		            writer.append(",");
+		        }
+			}
+		    writer.append("\n");
+		     		    
+		    // Run through every transaction
+			for (Transaction trans : staticTransactions) {
+				transStrings.clear();
+				transStrings.add(Double.toString(trans.getTransactionAmount()));
+				transStrings.add(escapeForCSV(trans.getCategory()));
+				transStrings.add(escapeForCSV(trans.getNote()));
+				transStrings.add(Boolean.toString(trans.isIncome()));
+		 		transStrings.add(formatter.format(trans.getDate()));
+				
+		 		// Add transaction to file
+				for (int i = 0; i < transStrings.size(); i++) {
+			        writer.append(transStrings.get(i));
+			        if (i < transStrings.size() - 1) {
+			            writer.append(",");
+			        }
+			    }
+			    writer.append("\n");
+		 	}
+			
+			writer.close();
+			showAlert(String.format("Export to %s Successfull", file.getName()),"Export Success");
+			
+ 		} catch (IOException e) {
+ 			showAlert("Failed to save to CSV", "Save Failure");
+ 			e.printStackTrace();
+ 		}    	
+	}
+
+	public static void showAlert(String message, String title) {
+		Alert alert = new Alert(AlertType.NONE, message, ButtonType.OK);
+		
+		alert.setTitle(title);
+		alert.initOwner(primaryStage);
+		alert.showAndWait();
+	}
+
+	
+	public Stage getStage() {
+		return primaryStage;
+	}
+	public void setStage(Stage stage) {
+		Budget.primaryStage = stage;
+	}
+	
+	public static void setStaticTransactions(ObservableList<Transaction> transList) {
+		Budget.staticTransactions = transList;
+	}
 	
 }

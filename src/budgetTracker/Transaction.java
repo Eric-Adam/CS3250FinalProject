@@ -35,11 +35,11 @@ public class Transaction{
     // Formatted as yyyy-mm-dd
     private final ObjectProperty<LocalDate> date = new SimpleObjectProperty<>();
     
-	private static int currentID=0;
+	private final IntegerProperty id = new SimpleIntegerProperty();
 	
 	
-	public Transaction(double transactionAmount, String category, String note, boolean income, LocalDate date) {
-        this.transactionID.set(++currentID);
+	public Transaction(double transactionAmount, String category, String note, boolean income, LocalDate date, int id) {
+		this.id.set(id);
         this.transactionAmount.set(transactionAmount);
         this.category.set(category);
         this.note.set(note);
@@ -71,5 +71,9 @@ public class Transaction{
     public LocalDate getDate() { return date.get(); }
     public void setDate(LocalDate date) { this.date.set(date); }
     public ObjectProperty<LocalDate> dateProperty() { return date; }
+    
+    public int getId() { return id.get();}
+    public void setId(int id) { this.id.set(id);}
+	public IntegerProperty idProperty() { return id;}
 }
 

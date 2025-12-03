@@ -4,7 +4,9 @@ import java.sql.SQLException;
 
 import budgetTracker.MyDatabase;
 import javafx.geometry.Rectangle2D;
-
+import javafx.scene.control.Alert;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.Pane;
 
 import javafx.stage.Screen;
@@ -31,9 +33,9 @@ public class RunGUI extends Pane{
 		
 		// Create Database
 		try {
-			this.db = new MyDatabase("myData.db");
+			this.db = new MyDatabase("src/myData.db");
 		} catch (SQLException e) {
-			System.out.println("No database found.");
+			showAlert("No database found.", "Database Failure");
 			e.printStackTrace();
 		}
 			
@@ -103,4 +105,11 @@ public class RunGUI extends Pane{
 		this.username = name;
 	}
 	
+	private void showAlert(String message, String title) {
+		Alert alert = new Alert(AlertType.NONE, message, ButtonType.OK);
+		
+		alert.setTitle(title);
+		alert.initOwner(primaryStage);
+		alert.showAndWait();
+	}
 }

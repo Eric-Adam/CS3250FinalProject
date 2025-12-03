@@ -1,10 +1,7 @@
 package budgetTracker;
 
 import java.time.LocalDate;
-import java.util.Comparator;
-
 import javafx.collections.FXCollections;
-import javafx.collections.transformation.SortedList;
 
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.ContentDisplay;
@@ -61,6 +58,7 @@ public class HistoryTable extends TableView<Transaction>{
 		categoryColumn.prefWidthProperty().bind(this.widthProperty().multiply(0.2)); 
 		categoryColumn.setOnEditCommit(event -> {
 			event.getRowValue().setCategory(event.getNewValue());
+			Budget.editTransaction(event.getRowValue());
             update();
 		});
 
@@ -77,7 +75,9 @@ public class HistoryTable extends TableView<Transaction>{
 		amountColumn.setOnEditCommit(event-> {
 			try {
 				event.getRowValue().setTransactionAmount(event.getNewValue());
+				Budget.editTransaction(event.getRowValue());
                 update();
+                
                 
 			} catch (NumberFormatException e){
 				System.out.println("Failed to edit amount.\n");
@@ -90,16 +90,20 @@ public class HistoryTable extends TableView<Transaction>{
 		noteColumn.setCellValueFactory(cellData -> cellData.getValue().noteProperty());
 		noteColumn.setCellFactory(TextFieldTableCell.forTableColumn());
 		noteColumn.prefWidthProperty().bind(this.widthProperty().multiply(0.4)); 
+		
 		noteColumn.setOnEditCommit(event-> {
 			event.getRowValue().setNote(event.getNewValue());
+			Budget.editTransaction(event.getRowValue());
             update();
 		});
 		
 		// --- --- Date column
 		dateColumn.setCellValueFactory(cellData -> cellData.getValue().dateProperty());
 		dateColumn.prefWidthProperty().bind(this.widthProperty().multiply(0.15)); 
+		
 		dateColumn.setOnEditCommit(event -> {
 		    event.getRowValue().setDate(event.getNewValue());
+		    Budget.editTransaction(event.getRowValue());
             update();
 		});
 		dateColumn.setCellFactory(column -> new TableCell<Transaction, LocalDate>() {
@@ -111,6 +115,7 @@ public class HistoryTable extends TableView<Transaction>{
 		        // Commit when a date is picked
 		        datePicker.setOnAction(event -> {
 		        	LocalDate newDate = datePicker.getValue();
+		        	
 	                commitEdit(newDate);
 		        });
 		    }
@@ -170,6 +175,7 @@ public class HistoryTable extends TableView<Transaction>{
 
 		            checkBox.setOnAction(event -> {
 		                transaction.setIncome(checkBox.isSelected());
+		                Budget.editTransaction(transaction);
 		                update();
 		            });
 		        }
@@ -196,16 +202,11 @@ public class HistoryTable extends TableView<Transaction>{
 		this.getColumns().addAll(indexColumn,categoryColumn,amountColumn, 
 									  noteColumn,dateColumn);
 		
-		// Sort the list by wrapping in a SortedList
-		SortedList<Transaction> sortedList = new SortedList<>(budget.transactions);
-		sortedList.setComparator(Comparator.comparing(Transaction::getTransactionID).reversed());
-		
 		// Set data for table view
-		this.setItems(sortedList);
+		this.setItems(budget.transactions);
 	}
 	
 	public void update() {
-		budget.overwrite();
 		budget.refreshData();
 		
 		title.update();

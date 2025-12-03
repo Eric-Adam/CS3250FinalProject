@@ -16,7 +16,7 @@ public class TrackerPage extends BorderPane{
 		setName(name);
 		
 		// Create budget
-		Budget budget = new Budget(runGUI.getDB(), name);
+		Budget budget = new Budget(runGUI, name);
 		
 		// Get screen sizes to set max limits for each Pane
 		Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();

@@ -1,27 +1,34 @@
 package myGUI;
 
-import java.io.BufferedReader;
+import budgetTracker.NewUser;
+
 import java.io.File;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.Statement;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Optional;
+
 import javax.swing.JOptionPane;
 
-import budgetTracker.NewUser;
+import org.mindrot.jbcrypt.BCrypt;
 
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.layout.AnchorPane;
@@ -31,19 +38,18 @@ import javafx.scene.layout.VBox;
 
 public class UserCoverPage extends AnchorPane{
 	private final double WINDOW_HEIGHT_START = 160.0;
-	private final double WINDOW_HEIGHT_LOGIN = 230.0; // TODO: adjust once passwords are added
+	private final double WINDOW_HEIGHT_LOGIN = 200.0; 
 	private final double WINDOW_HEIGHT_NEW_USER = 350.0;
 	
-	private String userFile = "src/resources/userData.csv";
-	private ArrayList<String> usernames = new ArrayList<String>();
-	private ArrayList<String> filePaths = new ArrayList<String>();
-	private ArrayList<Node> nodeList = new ArrayList<>();
+	private ArrayList<String> usernames = new ArrayList<>();
+	private ArrayList<String> hashedPasswords = new ArrayList<>();
+	private ArrayList<Node> newUserNodes = new ArrayList<>();
+	private ArrayList<Node> loginNodes = new ArrayList<>();
 	
 	private RunGUI runGUI;
 	
 	private ToggleButton loginButton;
 	private ToggleButton newUserButton;
-	private HBox selectUserVbox;
 	
 
 	public UserCoverPage(RunGUI runGUI) {
@@ -56,31 +62,37 @@ public class UserCoverPage extends AnchorPane{
 		// Login Section
 		loginButton = new ToggleButton("Login");
 		newUserButton = new ToggleButton("New User");
-		HBox loginVbox = new HBox(15);
-		loginVbox.getChildren().addAll(loginButton, newUserButton);
+		HBox loginHbox = new HBox(15);
+		loginHbox.getChildren().addAll(loginButton, newUserButton);
 		
 		// Known User Section
 		ComboBox<String> selectUserCombo = new ComboBox<String>();
 		selectUserCombo.getItems().addAll(usernames);
         selectUserCombo.setPromptText("Username");			
-		Button enterButton = new Button("Enter");
-		selectUserVbox = new HBox(5);
-		selectUserVbox.getChildren().addAll(selectUserCombo, enterButton);
+		HBox selectUserHbox = new HBox(5);
+		selectUserHbox.getChildren().add(selectUserCombo);
+		loginNodes.add(selectUserHbox);
 		
-		// TODO: add password field and password hashing if I have time
+		// Password Section
+		Button enterButton = new Button("Enter");
+		PasswordField passwordField = new PasswordField();
+		HBox passwordHbox = new HBox(5);
+		passwordHbox.getChildren().addAll(passwordField, enterButton);
+		loginNodes.add(passwordHbox);
+		
 		
 		// New User Section
 		Label fNameLabel = new Label("First Name:     ");
 		TextField fNameField = new TextField("");
 		HBox fNameHbox = new HBox(5);
 		fNameHbox.getChildren().addAll(fNameLabel, fNameField);
-		nodeList.add(fNameHbox);
+		newUserNodes.add(fNameHbox);
 		
 		Label lNameLabel = new Label("Last Name:      ");
 		TextField lNameField = new TextField("");
 		HBox lNameHbox = new HBox(5);
 		lNameHbox.getChildren().addAll(lNameLabel, lNameField);
-		nodeList.add(lNameHbox);
+		newUserNodes.add(lNameHbox);
 		
 		// TODO: add password field and password hashing if I have time
 		
@@ -88,15 +100,15 @@ public class UserCoverPage extends AnchorPane{
 		TextField initialValueField = new TextField("0.00");
 		HBox initialValueHbox = new HBox(5);
 		initialValueHbox.getChildren().addAll(initialValueLabel, initialValueField);
-		nodeList.add(initialValueHbox);
+		newUserNodes.add(initialValueHbox);
 		
 		Button submitUserButton = new Button("Submit");
-		nodeList.add(submitUserButton);
+		newUserNodes.add(submitUserButton);
 		
 		// Put it all together
 		VBox centerVBox = new VBox(15);
-		centerVBox.getChildren().addAll(loginVbox, selectUserVbox, fNameHbox, 
-				lNameHbox, initialValueHbox, submitUserButton);
+		centerVBox.getChildren().addAll(loginHbox, selectUserHbox, passwordHbox,
+				fNameHbox, lNameHbox, initialValueHbox, submitUserButton);
 		setTopAnchor(centerVBox, 10.0);
 		setLeftAnchor(centerVBox, 15.0);
 		this.getChildren().addAll(centerVBox);
@@ -142,7 +154,7 @@ public class UserCoverPage extends AnchorPane{
 			disableLogin(true);
 			
 			if (!selectedUser.equals("Username")) {
-				runGUI.switchToTracker(selectedUser);
+				passwordDialog(hashedPasswords.get(usernames.indexOf(selectedUser)), selectedUser);
 			}
 		});
 		
@@ -203,7 +215,7 @@ public class UserCoverPage extends AnchorPane{
 		});
 	}
 	
-	// Creates new user // TODO: update to SQL database insert
+	// Creates new user, updates to SQL database
 	private void createNewUser(Double initialAmount, String fName, String lName) {
 		
 		NewUser user = new NewUser(fName, lName, initialAmount);
@@ -288,47 +300,48 @@ public class UserCoverPage extends AnchorPane{
 		alert.showAndWait();		
 	}
 	
-	// Escapes double quotes and removes commas
-	@Deprecated
-	private static String escapeForCSV(String value) {
-		if (value.contains("\"")) {
-	        value = value.replace("\"", "\"\"");
-	        return "\"" + value + "\"";
-	    }
-	    if (value.contains(","))
-    		value = value.replace(",", "");
-	    
-	    return value;
-	}
-	
-	@Deprecated
-	private void loadUserData() {
-		usernames.clear();
-		filePaths.clear();
-		
-        try (BufferedReader br = new BufferedReader(new FileReader(userFile))) {
-            String line;
-            int count = 0;
-            while ((line = br.readLine()) != null) {
-            	if(count>0) {
-	            	String[] values = line.split(",");
-	                usernames.add(values[0]);
-	                filePaths.add(values[1]);
-                }
-            	count++;
-            }           
-        } catch (Exception e) {
-            showAlert("Failed to load users","Load User Failed");
-        }
-	}
+//	// Escapes double quotes and removes commas
+//	@Deprecated
+//	private static String escapeForCSV(String value) {
+//		if (value.contains("\"")) {
+//	        value = value.replace("\"", "\"\"");
+//	        return "\"" + value + "\"";
+//	    }
+//	    if (value.contains(","))
+//    		value = value.replace(",", "");
+//	    
+//	    return value;
+//	}
+//	
+//	@Deprecated
+//	private void loadUserData() {
+//		usernames.clear();
+//		filePaths.clear();
+//		
+//        try (BufferedReader br = new BufferedReader(new FileReader(userFile))) {
+//            String line;
+//            int count = 0;
+//            while ((line = br.readLine()) != null) {
+//            	if(count>0) {
+//	            	String[] values = line.split(",");
+//	                usernames.add(values[0]);
+//	                filePaths.add(values[1]);
+//                }
+//            	count++;
+//            }           
+//        } catch (Exception e) {
+//            showAlert("Failed to load users","Load User Failed");
+//        }
+//	}
 	
 	// Load users from database
 	private void pullUserData() {
 		usernames.clear();
+		hashedPasswords.clear();
 		
-		// SQL statement for selecting user names TODO: replace UserList w/ Users if passwords are functional
-		String sql = "SELECT Name \r\n"
-				+ "FROM UserList\r\n"
+		// SQL statement for selecting user names 
+		String sql = "SELECT Name, Password_Hash \r\n"
+				+ "FROM Users\r\n"
 				+ "ORDER by Name ASC;";	
 				
 				
@@ -338,27 +351,29 @@ public class UserCoverPage extends AnchorPane{
 	        Statement stmt = conn.createStatement();
 	        ResultSet rs = stmt.executeQuery(sql);
 	        
-			String username;
+			String username, password;
 			
 	        while (rs.next()) {
 	        	username = rs.getString("Name");
+	        	password = rs.getString("Password_Hash");
 	            
-	            // Add names to usernames list
+	            // Add user data to lists
 	            usernames.add(username);
-	            // TODO: Add hashed passwords to a list if passwords are functional
+	            hashedPasswords.add(password);
 	        }
 	        
 		} catch (Exception e) {
-	    	System.out.println("Failed to load users from database");
+	    	System.out.println("Failed to load data from database");
 	        e.printStackTrace();
 	    }
 	}
 	
+	
 	// Make sections appear and disappear	
-	private void disableNewUser(boolean disable) {
+	private void disableNodes(boolean disable, ToggleButton button, ArrayList<Node> nodeList, double height) {
 		boolean enable = !disable;
-		
-		newUserButton.setSelected(enable);
+
+		button.setSelected(enable);
 		
 		for(Node node : nodeList) {
 			node.setVisible(enable);
@@ -366,24 +381,17 @@ public class UserCoverPage extends AnchorPane{
 		}
 		
 		if (enable)
-			resizeWindow(WINDOW_HEIGHT_NEW_USER);
-		else
-			resizeWindow(WINDOW_HEIGHT_START);		
-	}
-	
-	private void disableLogin(boolean disable) {
-		boolean enable = !disable;
-
-		loginButton.setSelected(enable);
-		
-		selectUserVbox.setVisible(enable); 
-		selectUserVbox.setManaged(enable);
-		
-		if (enable)
-			resizeWindow(WINDOW_HEIGHT_LOGIN);
+			resizeWindow(height);
 		else
 			resizeWindow(WINDOW_HEIGHT_START);
 	}
+	private void disableLogin(boolean disable) {
+		disableNodes(disable, loginButton, loginNodes, WINDOW_HEIGHT_LOGIN);
+	}
+	private void disableNewUser(boolean disable) {
+		disableNodes(disable, newUserButton, newUserNodes, WINDOW_HEIGHT_NEW_USER);
+	}
+	
 	
 	// Change window size to fit appearing/disappearing nodes
 	private void resizeWindow(double height) {
@@ -396,5 +404,41 @@ public class UserCoverPage extends AnchorPane{
 		this.runGUI = runGUI;
 	}
 
+	private boolean verifyPassword(String password, String hashedPassword) {
+		return BCrypt.checkpw(password, hashedPassword);
+	}
+	
+	private void passwordDialog(String userHashedPassword, String user) {
+		Dialog<Boolean> dialog = new Dialog<>();
+		dialog.setTitle("Enter Password");
+		dialog.setHeaderText("Enter your password below.");
+		
+		ButtonType passwordLoginButtonType = new ButtonType("Login", ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(passwordLoginButtonType, ButtonType.CANCEL);
+		
+		HBox passwordBox = new HBox(5);
+		PasswordField passwordField = new PasswordField();
+		passwordBox.getChildren().add(passwordField);		
+	
+ 		dialog.getDialogPane().setContent(passwordBox);		
+ 	   
+		// Data capture
+		dialog.setResultConverter(dialogButton -> {
+			if (dialogButton == passwordLoginButtonType) {
+				String rawPassword = passwordField.getText();
+				
+				return verifyPassword(rawPassword, userHashedPassword);
+				
+			}
+				return null;
+			});
+		   
+		
+		Optional<Boolean> result = dialog.showAndWait();
+		
+		if (result.get()) {
+			runGUI.switchToTracker(user);
+		}
+	}
 
 }

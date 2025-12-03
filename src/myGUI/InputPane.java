@@ -1,4 +1,9 @@
 package myGUI;
+
+import budgetTracker.Budget;
+import budgetTracker.HistoryTable;
+import budgetTracker.Transaction;
+
 import java.io.File;
 import java.time.LocalDate;
 import java.util.Optional;
@@ -6,16 +11,11 @@ import java.util.Optional;
 import javax.imageio.ImageIO;
 import javax.swing.JOptionPane;
 
-import budgetTracker.Budget;
-import budgetTracker.HistoryTable;
-import budgetTracker.Transaction;
-
 import javafx.embed.swing.SwingFXUtils;
 import javafx.geometry.Insets;
+
 import javafx.scene.Node;
 import javafx.scene.chart.Chart;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonBar.ButtonData;
 import javafx.scene.control.ButtonType;
@@ -54,9 +54,6 @@ public class InputPane extends VBox{
 		this.budget = budget;
 		
 		// Transaction control buttons
-		Label transactionLabel =  new Label("\t\tTransactions:");
-		this.getChildren().add(transactionLabel);
-		
 		HBox transactionButtons = new HBox(5);
 		transactionButtons.getChildren().addAll(addNewTransactionButton,
 				editTransactionButton,deleteTransactionButton);
@@ -67,23 +64,27 @@ public class InputPane extends VBox{
 		this.getChildren().add(new Separator());
 		
 		// Chart control buttons
-		Label chartLabel = new Label("\t\tCharts and Graphs:");
-		this.getChildren().add(chartLabel);
-		
-		Button saveChartButton = new Button("Save");
+		Button saveChartButton = new Button("Save...");
 		String[] chartTypes = {"30-Day Transactions", "Category", "In v Out"};
 		ComboBox<String> chartTypeComboBox = new ComboBox<>();
 		chartTypeComboBox.getItems().addAll(chartTypes);
 		chartTypeComboBox.setValue("30-Day Transactions");
+		
 		HBox chartTypeHbox = new HBox(5);
 		chartTypeHbox.getChildren().addAll(chartTypeComboBox,saveChartButton);
-		this.getChildren().addAll(chartTypeHbox, new Separator());
+		this.getChildren().add(chartTypeHbox);
+		this.getChildren().add(new Separator());
 		
 		
 		// -------------------------------------Export File Section ---------------------------------
-		// TODO: Add section to export files (csv, png of table?)
-
+		Button exportButton = new Button("Export Data...");
 		
+		HBox exportHbox = new HBox(5);
+		exportHbox.getChildren().add(exportButton);
+		this.getChildren().add(exportHbox);
+		this.getChildren().add(new Separator());
+		
+
 		// ----------------------------------- Listener Section -----------------------------------		
 		// Transaction Listeners		
 		// --- Add New Transaction: Displays buttons related to adding transactions
@@ -94,14 +95,11 @@ public class InputPane extends VBox{
 				disableDelete();
 				
 				addTransactionDialog();
-				
 
             } else {
             	// Close section
             	disableAddNew();
             }
-			
-			
         });
 			
 		
@@ -151,8 +149,7 @@ public class InputPane extends VBox{
 		                
 		                // Remove selected transaction
 		                if (response == JOptionPane.YES_OPTION) {
-		                    budget.transactions.remove(selected);
-		                    showAlert("Transaction removed","Removed Transaction");
+		                    Budget.deleteTransaction(selected);
 		                    update();
 		                }
 		            }
@@ -194,9 +191,20 @@ public class InputPane extends VBox{
 			else 
 				saveChart(fileNames[2], chartPane.charts.barChart);
         });
+		
+		
+		// Export Listener
+		exportButton.setOnAction(event->{
+			Budget.setStaticTransactions(budget.transactions);
+			Budget.exportCSV();
+			
+		});
+		
+		
 	
 	}
 	
+
 	// Save chart with user specified location and name
 	private void saveChart(String fileName, Chart chart) {
 		WritableImage image = chart.snapshot(null, null);
@@ -215,18 +223,16 @@ public class InputPane extends VBox{
 	        File file = fileChooser.showSaveDialog(primaryStage);
 	        
             ImageIO.write(SwingFXUtils.fromFXImage(image, null), "png", file);
-			showAlert("Successfully saved chart " +file.getName(), "Saved Successfully");
+            Budget.showAlert("Successfully saved chart " +file.getName(), "Saved Successfully");
 
         } 
 		catch (Exception e) {
-			showAlert("Failed to save chart", "Save Failure");
+			Budget.showAlert("Failed to save chart", "Save Failure");
         }
 	}
 
 	// Keep everything in sync
-	private void update() {
-		budget.overwrite();
-		
+	private void update() {		
 		historyTable.update();
 		title.update();
 		chartPane.update();
@@ -251,15 +257,6 @@ public class InputPane extends VBox{
 		
 		historyTable.setOnMouseClicked(null);
 		historyTable.setStyle("");
-	}
-	
-	// Show alerts
-	private void showAlert(String message, String title) {
-		Alert alert = new Alert(AlertType.NONE, message, ButtonType.OK);
-		
-		alert.setTitle(title);
-		alert.initOwner(primaryStage);
-		alert.showAndWait();
 	}
 	
 	public Stage getStage() {
@@ -380,7 +377,7 @@ public class InputPane extends VBox{
 				boolean typeEntry = transactionType.getValue().equalsIgnoreCase("income");
 				LocalDate dateEntry = newTransactionDateEntry.getValue();
 				
-				Transaction newTransaction = new Transaction(amountEntry, categoryEntry, noteEntry, typeEntry, dateEntry); 	   	 	
+				Transaction newTransaction = new Transaction(amountEntry, categoryEntry, noteEntry, typeEntry, dateEntry, 0); 	   	 	
 					  
 				return newTransaction;
 			}
@@ -391,10 +388,10 @@ public class InputPane extends VBox{
 		Optional<Transaction> result = dialog.showAndWait();
 		
 		result.ifPresent(newTransaction -> {
-			budget.transactions.add(newTransaction);
+			Budget.addTransaction(newTransaction, budget.getName());
 			update();
 			
-			showAlert(
+			Budget.showAlert(
 				"Added Transaction" +
 				"\nCategory:\t" + newTransaction.getCategory() +
 				"\nAmount:\t$" + newTransaction.getTransactionAmount() +
