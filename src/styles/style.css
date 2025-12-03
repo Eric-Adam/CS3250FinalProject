@@ -52,11 +52,6 @@ ToggleButton {
 	-fx-padding: 40px; 
 }
 
-PasswordField {
-	-fx-background-color: #f3f0f4;
-	-fx-padding: 15px;
-}
-
 .tracker-page ToggleButton {
 	-fx-padding: 10px; 
 }
