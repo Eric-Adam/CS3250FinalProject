@@ -57,15 +57,12 @@ public class Budget {
    		 "Subscriptions","Takeout/Delivery","Transfer","Travel","Utilities",
    		 "Miscellaneous"};
 	
-	// Original constructor using CSV files
-//	@Deprecated
-//	public Budget(String filePath) {
-//		// Load data
-//		this.filePath = filePath;
-//		loadTransactions();		
-//	}	
-	
-	// New constructor utilizing SQL database
+	/**
+	 * Budget containing the transaction data for user
+	 * 
+	 * @param runGUI Instance of RunGUI connected to stage
+	 * @param name Name of the user 
+	 */
 	public Budget(RunGUI runGUI, String name) {
 		setDB(runGUI.getDB());
 		setName(name);
@@ -73,15 +70,11 @@ public class Budget {
 		getTransactions();
 	}
 
-	public void setDB(MyDatabase db) {
-		Budget.db = db;
-	}
-	
-//	@Deprecated
-//	public String getFilePath() {
-//		return this.filePath;
-//	}
-
+	/**
+	 * Calculates and returns current balance
+	 * 
+	 * @return current balance
+	 */
     public double getOverallBalance() {
     	double balance = 0;
     	double tempAmount =0;
@@ -96,12 +89,18 @@ public class Budget {
     	return balance;
     }
     
-    public double getEarlierBalance(LocalDate startDate) {
+    /**
+     * Calculates and returns balance from an earlier date 
+     * 
+     * @param date Date of desired balance
+     * @return Balance on the date given
+     */
+    public double getEarlierBalance(LocalDate date) {
     	double balance = 0;
     	double tempAmount =0;
     	
     	for (Transaction transaction : transactions) {
-        	if (transaction.getDate().isBefore(startDate)) {
+        	if (transaction.getDate().isBefore(date)) {
         		tempAmount = transaction.getTransactionAmount();
         		balance += (transaction.isIncome()) ? tempAmount : -tempAmount;
         	}
@@ -112,25 +111,45 @@ public class Budget {
     	return balance;
     }
     
-    public double getTotalExpenses() {
-    	double total = 0;
+    /**
+     * Sums transactions and returns total
+     * 
+     * @param list List of transactions to be summed
+     * @return total Total of summed transactions
+     */
+    private double sumTransactions(ArrayList<Transaction> list) {
+		double total = 0;
     	
-    	for (Transaction out : expenses) {
-    		total += out.getTransactionAmount();
+    	for (Transaction item : list) {
+    		total += item.getTransactionAmount();
     	}
         
     	return total;
     }
     
-    public double getTotalIncome() {
-    	double total = 0;
-    	
-    	for (Transaction in : income) 
-        		total += in.getTransactionAmount();
-        		
-    	return total;
+    /**
+     * Returns sum of expense transactions
+     * 
+     * @return Sum of expense transactions
+     */
+    public double getTotalExpenses() {
+    	return sumTransactions(expenses);
     }
     
+    /**
+     *  Returns sum of income transactions
+     *  
+     * @return Sum of income transactions
+     */
+    public double getTotalIncome() {
+    	return sumTransactions(income);
+    }
+    
+    /**
+     * determines budget status based on ratio of remaining balance and total income
+     * 
+     * @return Status of budget
+     */
     public String getBudgetStatus() {
     	String status="";
     	double currentRemaining = getOverallBalance();
@@ -145,40 +164,10 @@ public class Budget {
     	
     	return status;
     }
-    
-
-    // Load transactions from CSV file
-//    @Deprecated
-//    private void loadTransactions() {
-//		// Pull data from CSV
-//		List<String[]> transactionData = new ArrayList<>();
-//
-//        try (BufferedReader br = new BufferedReader(new FileReader(filePath))) {
-//            String line;
-//
-//            while ((line = br.readLine()) != null) {
-//                String[] values = line.split(",");
-//                transactionData.add(values); 
-//            }
-//        } catch (Exception e) {
-//            System.out.println("Failed to load CSV data:\n" + e);
-//        }
-		
-		// Convert data to Transaction objects
-//		List<Transaction> transactionList = transactionData.stream()
-//		    .skip(1) // skip header
-//		    .map(row -> new Transaction(Double.parseDouble(row[0]), 
-//		    							row[1], 
-//		    							row[2], 
-//		    							Boolean.parseBoolean(row[3]), 
-//		    							LocalDate.parse(row[4])))
-//		    .collect(Collectors.toList());
-//		transactions.setAll(transactionList);
-//		
-//		fillIncomeExpense();
-//	}
 	
-    // Fill income/expense lists
+    /**
+     * Fill income/expense lists
+     */
 	private void fillIncomeExpense() {
 		
 		for (Transaction t : transactions) {
@@ -190,7 +179,9 @@ public class Budget {
 		}
 	}
 
-	// Load transactions from SQL database
+	/**
+	 * Load transactions from SQL database
+	 */
 	public void getTransactions() {
 		// Start fresh
 		transactions.clear();
@@ -233,85 +224,23 @@ public class Budget {
 		fillIncomeExpense();
 	}
 	
+	/**
+	 * Refreshes data for when changes are made
+	 */
     public void refreshData() {
     	// Clear old data and reload
     	income.clear();
     	expenses.clear();
     	
-//      loadTransactions();
     	getTransactions();
     }
          
- 	// Escapes double quotes and removes commas 
-    private static String escapeForCSV(String value) {
- 	    if (value.contains("\"")) {
- 	        value = value.replace("\"", "\"\"");
- 	        return "\"" + value + "\"";
- 	    }	
- 	    if (value.contains(","))
- 	    		value = value.replace(",", "");
- 	    return value;
- 	}
- 	
-    
-    // Overwrites CSV file for editing and deleting transactions
-//    @Deprecated
-//    public void overwrite() {
-//    	File file = new File(filePath);
-//    	String[] header = {"transactionAmount","category","note","income","date"};
-//    	List<String> transStrings = new ArrayList<String>();
-//    	DateTimeFormatter  formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
-//    	
-//    	// Add header - Overwrites file
-//    	try (FileWriter writer = new FileWriter(file, false)) {
-// 			for (int i = 0; i < header.length; i++) {
-// 		        writer.append(header[i]);
-// 		        if (i < header.length - 1) {
-// 		            writer.append(",");
-// 		        }
-// 		    }
-// 		    writer.append("\n");
-// 		    
-// 		} catch (IOException e) {
-// 			System.out.println("Failed to write to file");
-// 		}
-//    	
-//    	// Sort transactions by date
-//    	FXCollections.sort(transactions, (t1, t2) -> t1.getDate().compareTo(t2.getDate()));
-//    	
-//    	// Add transactions back to file
-//    	for (Transaction trans : transactions) {
-//    		transStrings.clear();
-//    		transStrings.add(Double.toString(trans.getTransactionAmount()));
-//    		transStrings.add(escapeForCSV(trans.getCategory()));
-//    		transStrings.add(escapeForCSV(trans.getNote()));
-//    		transStrings.add(Boolean.toString(trans.isIncome()));
-//	 		transStrings.add(formatter.format(trans.getDate()));
-// 		
-//	 		try (FileWriter writer = new FileWriter(file, true)) {
-//				for (int i = 0; i < transStrings.size(); i++) {
-//			        writer.append(transStrings.get(i));
-//			        if (i < transStrings.size() - 1) {
-//			            writer.append(",");
-//			        }
-//			    }
-//			    writer.append("\n");
-//			    
-//			} catch (IOException e) {
-//				System.out.println("Failed to write transaction to file");
-//			}
-//    	}
-//    }
-
-	public String getName() {
-		return name;
-	}
-
-	public void setName(String name) {
-		this.name = name;
-	}
-	
-	// Add new transaction to database
+	/**
+	 * Adds new transaction to database
+	 * 
+	 * @param transaction Transaction to be edited
+	 * @param owner User who made the transaction
+	 */
 	public static void addTransaction(Transaction transaction, String owner) {
 		int income = transaction.isIncome()? 1:0;
 		
@@ -341,7 +270,11 @@ public class Budget {
 	}
 	
 	
-	// Edit transaction in database
+	/**
+	 * Edits transaction in database
+	 * 
+	 * @param transaction Transaction to be edited
+	 */
 	public static void editTransaction(Transaction transaction) {
 		int income = transaction.isIncome()? 1:0;
 				
@@ -373,7 +306,11 @@ public class Budget {
 		
 	}
 	
-	// Remove transaction from database
+	/**
+	 * Removes transaction from database
+	 * 
+	 * @param transaction Transaction to be deleted
+	 */
 	public static void deleteTransaction(Transaction transaction) {
 				
 		// SQL statement for deleting a transaction
@@ -394,7 +331,10 @@ public class Budget {
 		
 	}
 
-	// Exports static transaction list to CSV file
+	
+	/**
+	 * Exports static transaction list to CSV file
+	 */
 	public static void exportCSV() {
 		// Set necessary variables
 		String[] header = {"transactionAmount","category","note","income","date"};
@@ -454,7 +394,30 @@ public class Budget {
  			e.printStackTrace();
  		}    	
 	}
+	
+ 	/**
+ 	 * Escapes double quotes and removes commas for exporting to CSV 
+ 	 * 
+ 	 * @param value String being adjusted
+ 	 * @return String with suitable double quotes and no commas
+ 	 */
+    private static String escapeForCSV(String value) {
+ 	    if (value.contains("\"")) {
+ 	        value = value.replace("\"", "\"\"");
+ 	        return "\"" + value + "\"";
+ 	    }	
+ 	    if (value.contains(","))
+ 	    		value = value.replace(",", "");
+ 	    return value;
+ 	}
+	
 
+	
+	/**
+	 * Display alert for given message and title
+	 * @param message Message to be delivered
+	 * @param title Title for alert
+	 */
 	public static void showAlert(String message, String title) {
 		Alert alert = new Alert(AlertType.NONE, message, ButtonType.OK);
 		
@@ -464,15 +427,13 @@ public class Budget {
 	}
 
 	
-	public Stage getStage() {
-		return primaryStage;
-	}
-	public void setStage(Stage stage) {
-		Budget.primaryStage = stage;
-	}
+	// Getters and setters
+	public Stage getStage() {return primaryStage;}
+	public String getName() {return name;}
 	
+	public void setStage(Stage stage) {Budget.primaryStage = stage;}
+	public void setName(String name) {this.name = name;}
 	public static void setStaticTransactions(ObservableList<Transaction> transList) {
-		Budget.staticTransactions = transList;
-	}
-	
+		Budget.staticTransactions = transList;}
+	public void setDB(MyDatabase db) {Budget.db = db;}
 }

@@ -24,8 +24,12 @@ public class HistoryTable extends TableView<Transaction>{
     public TableColumn<Transaction, Boolean> incomeColumn = new TableColumn<>("Income");
     public TableColumn<Transaction, LocalDate> dateColumn = new TableColumn<>("Date");
 
-	
-	@SuppressWarnings("unchecked")
+	/**
+	 * TableView displaying budget data
+	 * 
+	 * @param budget Budget with user data
+	 */
+    @SuppressWarnings("unchecked")
 	public HistoryTable(Budget budget) {
 		// Assign Budget object
 		this.budget = budget;
@@ -36,7 +40,10 @@ public class HistoryTable extends TableView<Transaction>{
 		// --- Tableview Columns
 		// --- --- Index column
 		TableColumn<Transaction, Integer> indexColumn = new TableColumn<>("ID");
+		indexColumn.prefWidthProperty().bind(this.widthProperty().multiply(0.05)); 
 		indexColumn.setCellFactory(col -> new TableCell<>() {
+			
+			// Override index to keep it in order
 		    @Override
 		    protected void updateItem(Integer item, boolean empty) {
 		        super.updateItem(item, empty);
@@ -47,26 +54,29 @@ public class HistoryTable extends TableView<Transaction>{
 		        }
 		    }
 		});
-		indexColumn.prefWidthProperty().bind(this.widthProperty().multiply(0.05)); 
+		
 		
 		// --- --- Category column
 		TableColumn<Transaction, String> categoryColumn = new TableColumn<>("Category");
 		categoryColumn.setCellValueFactory(cellData -> cellData.getValue().categoryProperty());
 		categoryColumn.setCellFactory(ComboBoxTableCell.forTableColumn(
-			    FXCollections.observableArrayList(Budget.categories)
-				));
+			    FXCollections.observableArrayList(Budget.categories)));
 		categoryColumn.prefWidthProperty().bind(this.widthProperty().multiply(0.2)); 
+		
 		categoryColumn.setOnEditCommit(event -> {
+			
 			event.getRowValue().setCategory(event.getNewValue());
 			Budget.editTransaction(event.getRowValue());
             update();
 		});
+		
 
 		// --- --- Amount column
 		TableColumn<Transaction, Double> amountColumn = new TableColumn<>("Amount");
 		amountColumn.setCellValueFactory(cellData -> cellData.getValue().transactionAmountProperty().asObject());
 		amountColumn.setCellFactory(TextFieldTableCell.forTableColumn(new javafx.util.converter.DoubleStringConverter()));
 		amountColumn.prefWidthProperty().bind(this.widthProperty().multiply(0.1)); 
+		
 		amountColumn.textProperty().addListener((observable, oldValue, newValue) -> {
 	        if (!newValue.matches("\\d*(\\.\\d{0,2})?")) {
 	        	amountColumn.setText(oldValue);
@@ -85,6 +95,7 @@ public class HistoryTable extends TableView<Transaction>{
 			}
 		});
 
+		
 		// --- --- Note column
 		TableColumn<Transaction, String> noteColumn = new TableColumn<>("Note");
 		noteColumn.setCellValueFactory(cellData -> cellData.getValue().noteProperty());
@@ -96,6 +107,7 @@ public class HistoryTable extends TableView<Transaction>{
 			Budget.editTransaction(event.getRowValue());
             update();
 		});
+		
 		
 		// --- --- Date column
 		dateColumn.setCellValueFactory(cellData -> cellData.getValue().dateProperty());
@@ -206,9 +218,11 @@ public class HistoryTable extends TableView<Transaction>{
 		this.setItems(budget.transactions);
 	}
 	
+    /**
+     * Keeps data in sync with tableview on edits/deletes
+     */
 	public void update() {
 		budget.refreshData();
-		
 		title.update();
 		chartPane.update();
 	}

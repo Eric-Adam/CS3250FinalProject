@@ -11,6 +11,11 @@ import javafx.stage.Screen;
 public class HistoryPane extends VBox{
 	private final HistoryTable historyTable;
 	
+	/**
+	 * Pane to contain the tableview 
+	 * 
+	 * @param budget Budget with user data
+	 */
 	public HistoryPane(Budget budget) {
 		
 		// TableView of transaction history

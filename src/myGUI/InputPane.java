@@ -46,7 +46,11 @@ public class InputPane extends VBox{
 		
 	private Budget budget;
 	
-	
+	/**
+	 * Pane for all the input options
+	 * 
+	 * @param budget Budget with user data
+	 */
 	public InputPane(Budget budget) {
 		super(20);
 		// -----------------------------------Transaction Section ---------------------------------
@@ -199,13 +203,15 @@ public class InputPane extends VBox{
 			Budget.exportCSV();
 			
 		});
-		
-		
-	
 	}
 	
 
-	// Save chart with user specified location and name
+	/**
+	 * Save chart with user specified location and name 
+	 * 
+	 * @param fileName Name of the file being saved
+	 * @param chart Chart being saved
+	 */
 	private void saveChart(String fileName, Chart chart) {
 		WritableImage image = chart.snapshot(null, null);
 		
@@ -231,19 +237,25 @@ public class InputPane extends VBox{
         }
 	}
 
-	// Keep everything in sync
+	/**
+	 * Keep everything in sync
+	 */
 	private void update() {		
 		historyTable.update();
 		title.update();
 		chartPane.update();
 	}
 
-	// Enable/disable new transaction section
+	/**
+	 * Enable/disable new transaction section
+	 */
 	private void disableAddNew() {
 		addNewTransactionButton.setSelected(false);		
 	}
 	
-	// Disable edit section
+	/**
+	 * Disable edit section
+	 */
 	private void disableEdit() {
 		editTransactionButton.setSelected(false);
 		
@@ -251,7 +263,9 @@ public class InputPane extends VBox{
 		historyTable.getColumns().remove(historyTable.incomeColumn);
 	}
 	
-	// Disable delete section
+	/**
+	 * Disable delete section
+	 */
 	private void disableDelete() {
 		deleteTransactionButton.setSelected(false);
 		
@@ -259,23 +273,9 @@ public class InputPane extends VBox{
 		historyTable.setStyle("");
 	}
 	
-	public Stage getStage() {
-		return primaryStage;
-	}
-	public void setStage(Stage stage) {
-		this.primaryStage = stage;
-	}
-	public void setHistoryTable(HistoryTable historyTable) {
-		this.historyTable = historyTable;
-	}
-	public void setTitle(TitlePane title) {
-		this.title = title;
-	}
-	public void setChart(ChartPane chartPane) {
-		this.chartPane = chartPane;
-	}
-	
-	// Add new transaction dialog box
+	/**
+	 * Dialog box for adding transactions
+	 */
 	public void addTransactionDialog() {
 		addNewTransactionButton.setSelected(false);
 		
@@ -402,22 +402,12 @@ public class InputPane extends VBox{
 			});	
 		}
 	
+
+	// Getter and setters
+	public Stage getStage() {return primaryStage;}
 	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
+	public void setStage(Stage stage) {this.primaryStage = stage;}
+	public void setHistoryTable(HistoryTable historyTable) {this.historyTable = historyTable;}
+	public void setTitle(TitlePane title) {this.title = title;}
+	public void setChart(ChartPane chartPane) {	this.chartPane = chartPane;}
 }

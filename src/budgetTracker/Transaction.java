@@ -17,29 +17,25 @@ import javafx.beans.property.SimpleStringProperty;
 
 public class Transaction{
 	
-	// Unique for each transaction
-	private final IntegerProperty transactionID = new SimpleIntegerProperty();
-	
-	// Limited to positive and 2 decimals by GUI
     private final DoubleProperty transactionAmount = new SimpleDoubleProperty();
-    
-    // For larger grouping of transactions (e.g. Household; Car)
     private final StringProperty category = new SimpleStringProperty();
-    
-    // Small phrase for more specific details (e.g. towels, sheets; gas, oil change)
     private final StringProperty note = new SimpleStringProperty();
-    
-    // True for income; false for expense
     private final BooleanProperty income = new SimpleBooleanProperty();
-    
-    // Formatted as yyyy-mm-dd
     private final ObjectProperty<LocalDate> date = new SimpleObjectProperty<>();
-    
-	private final IntegerProperty id = new SimpleIntegerProperty();
+   	private final IntegerProperty databaseID = new SimpleIntegerProperty();
 	
-	
+	/**
+	 * Transactions for budget
+	 * 
+	 * @param transactionAmount The amount of the transaction, limited to positive and 2 decimals by GUI
+	 * @param category For larger grouping of transactions (e.g. Household; Car)
+	 * @param note Small phrase for more specific details (e.g. towels, sheets; gas, oil change)
+	 * @param income True for income; false for expense
+	 * @param date Formatted as yyyy-mm-dd
+	 * @param id ID in database for editing/deleting needs
+	 */
 	public Transaction(double transactionAmount, String category, String note, boolean income, LocalDate date, int id) {
-		this.id.set(id);
+		this.databaseID.set(id);
         this.transactionAmount.set(transactionAmount);
         this.category.set(category);
         this.note.set(note);
@@ -48,10 +44,6 @@ public class Transaction{
 	}
 
 	// Getters and setters for property values
-    public int getTransactionID() { return transactionID.get(); }
-    public void setTransactionID(int id) { this.transactionID.set(id); }
-    public IntegerProperty transactionIDProperty() { return transactionID; }
-
     public double getTransactionAmount() { return transactionAmount.get(); }
     public void setTransactionAmount(double amount) { this.transactionAmount.set(amount); }
     public DoubleProperty transactionAmountProperty() { return transactionAmount; }
@@ -72,8 +64,8 @@ public class Transaction{
     public void setDate(LocalDate date) { this.date.set(date); }
     public ObjectProperty<LocalDate> dateProperty() { return date; }
     
-    public int getId() { return id.get();}
-    public void setId(int id) { this.id.set(id);}
-	public IntegerProperty idProperty() { return id;}
+    public int getId() { return databaseID.get();}
+    public void setId(int id) { this.databaseID.set(id);}
+	public IntegerProperty idProperty() { return databaseID;}
 }
 

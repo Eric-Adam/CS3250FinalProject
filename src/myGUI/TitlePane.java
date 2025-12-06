@@ -14,19 +14,29 @@ import javafx.stage.Screen;
 public class TitlePane extends AnchorPane{
 	private String status;
 	private String balance;
+	private String welcomeMessage;
+	
 	private Budget budget;
+	private RunGUI runGUI;
 	
 	private Label balanceLabel = new Label();
 	private Label statusLabel = new Label();
+	private Label welcomeLabel = new Label();
 	
-    
+    /**
+     * Pane containing title, status and budget
+     * 
+     * @param runGUI Instance of RunGUI connected to primaryStage
+     * @param budget Budget with user data
+     */
 	public TitlePane(RunGUI runGUI, Budget budget) {
 		this.budget = budget;
+		this.runGUI = runGUI;
 		Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
 		
 		// Main Title
-		String welcomeMessage = "------ Welcome " + runGUI.getUsername() + " ------";
-		Label welcomeLabel = new Label(welcomeMessage);
+		welcomeMessage = "------ Welcome " + runGUI.getUsername() + " ------";
+		welcomeLabel.setText(welcomeMessage);
 		HBox  welcomeHBox = new HBox (welcomeLabel);
 		
 		double welcomeLeftAnchor = screenBounds.getWidth() / 2 - 100;
@@ -63,13 +73,19 @@ public class TitlePane extends AnchorPane{
 		});
 
 	}	
-	
-	public void update() {
+
+	/**
+	 *Updates status and balance for when data changes and welcome message for when user changes
+	 */
+	public void update() {	
 		budget.refreshData();
 		balance = String.format("%.2f", budget.getOverallBalance());
 		status = budget.getBudgetStatus();
+		
+		welcomeMessage = "------ Welcome " + runGUI.getUsername() + " ------";
 		balanceLabel.setText("Remaining Balance:\t$ " + balance); 
 		statusLabel.setText("Status:\t" + status);
+		welcomeLabel.setText(welcomeMessage);
 	}
 	
 }

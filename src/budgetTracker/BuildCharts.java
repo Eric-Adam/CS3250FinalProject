@@ -2,11 +2,9 @@ package budgetTracker;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.collections.transformation.SortedList;
 import javafx.geometry.Side;
 
 import javafx.scene.chart.BarChart;
@@ -41,6 +39,13 @@ public class BuildCharts extends Pane{
 					= new BarChart<String, Number>(barXAxis, barYAxis);
 
 		
+	/**
+	 * Builds the line, pie, and bar chart from budget data
+	 * 
+	 * @param budget Budget with user data
+	 * @param chartPane Pane the charts will be displayed on 
+	 * @param maxWidth Width to limit charts 	
+	 */
 	public BuildCharts(Budget budget, ChartPane chartPane, double maxWidth) {
 		this.budget = budget;
 		this.chartPane = chartPane;
@@ -49,8 +54,11 @@ public class BuildCharts extends Pane{
 		createLineChart();
 		createPieChart();
 		createBarChart();
-}
+	}
 	
+	/**
+	 * Creates the 30-day review line chart
+	 */
 	public void createLineChart() {	
 		// Start fresh
 		lineChart.getData().clear();
@@ -111,6 +119,9 @@ public class BuildCharts extends Pane{
         lineChart.setLegendVisible(false);
 	}
 
+	/**
+	 * Creates the category pie chart
+	 */
 	public void createPieChart() {
 		// Start fresh
 		pieChart.getData().clear();
@@ -156,6 +167,9 @@ public class BuildCharts extends Pane{
 		pieChart.getData().addAll(pieChartData); 
 	}
 	
+	/**
+	 * Creates the in vs out bar chart
+	 */
 	public void createBarChart() {
 		// Start fresh
 		barChart.getData().clear();
@@ -186,7 +200,9 @@ public class BuildCharts extends Pane{
 		barChart.setCategoryGap(50.0);
 		}
 	
-	// Swap which chart is displayed
+	/**
+	 * Displayes the 30-day review line chart
+	 */
 	public void showLineChart() {
 		this.getChildren().clear();
 		this.getChildren().add(lineChart);	
@@ -197,6 +213,9 @@ public class BuildCharts extends Pane{
         lineChart.setPrefHeight(CHART_HEIGHT); 
 	}
 	
+	/**
+	 * Displayes the category pie chart
+	 */
 	public void showPieChart() {
 		this.getChildren().clear();
 		this.getChildren().add(pieChart);
@@ -207,6 +226,9 @@ public class BuildCharts extends Pane{
 		pieChart.setPrefHeight(CHART_HEIGHT); 
 	}
 	
+	/**
+	 * Displayes the in vs out bar chart
+	 */
 	public void showBarChart() {
 		this.getChildren().clear();
 		this.getChildren().add(barChart);	

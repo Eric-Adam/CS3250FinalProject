@@ -10,13 +10,21 @@ import javafx.stage.Screen;
 
 public class TrackerPage extends BorderPane{
 	public TitlePane titlePane;
+	public ChartPane chartPane;
 	public String name;
+	public Budget budget;
 	
+	/**
+	 * Page displayed on login
+	 * 
+	 * @param runGUI Instance of RunGUI connected to primaryStage
+	 * @param name Name of user logging in
+	 */
 	public TrackerPage(RunGUI runGUI, String name) {
 		setName(name);
 		
 		// Create budget
-		Budget budget = new Budget(runGUI, name);
+		budget = new Budget(runGUI, name);
 		
 		// Get screen sizes to set max limits for each Pane
 		Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
@@ -35,7 +43,7 @@ public class TrackerPage extends BorderPane{
 		Insets historyInsets = new Insets(25,10,10,10);
 		
 		// Top: Title, Status, Balance, Logout
-		TitlePane titlePane = new TitlePane(runGUI, budget);
+		titlePane = new TitlePane(runGUI, budget);
 		titlePane.setPadding(titleInsets);
 		titlePane.setMaxWidth(screenWidth);
 		titlePane.setPrefWidth(screenWidth);
@@ -44,7 +52,7 @@ public class TrackerPage extends BorderPane{
 		this.setTop(titlePane);
 		
 	    // Center: Budget Charts
-		ChartPane chartPane = new ChartPane(budget, maxChartWidth);
+		chartPane = new ChartPane(budget, maxChartWidth);
 		chartPane.setPadding(chartInsets);
 		chartPane.setMaxWidth(maxChartWidth);
 		chartPane.setMaxHeight(maxChartHeight);
@@ -77,10 +85,14 @@ public class TrackerPage extends BorderPane{
 		this.setLeft(inputPane);	
 	}
 	
-	public String getName() {
-		return this.name;
+	/**
+	 * Keeps everything in sync
+	 */
+	public void update() {
+		titlePane.update();
+		chartPane.update();
 	}
-	public void setName(String name) {
-		this.name = name;
-	}
+	
+	public String getName() {return this.name;}
+	public void setName(String name) {this.name = name;	}
 }

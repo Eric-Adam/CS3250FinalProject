@@ -2,11 +2,8 @@ package myGUI;
 
 import budgetTracker.NewUser;
 
-import java.sql.Connection;
 import java.sql.ResultSet;
-import java.sql.Statement;
-
-import java.time.LocalDate;
+import java.sql.SQLException;
 
 import java.util.ArrayList;
 import java.util.Optional;
@@ -47,8 +44,12 @@ public class UserCoverPage extends AnchorPane{
 	
 	private ToggleButton loginButton;
 	private ToggleButton newUserButton;
-	
-
+		
+	/**
+	 * Cover page to navigate login
+	 * 
+	 * @param runGUI 
+	 */
 	public UserCoverPage(RunGUI runGUI) {
 		setRunGUI(runGUI);
 				
@@ -195,7 +196,7 @@ public class UserCoverPage extends AnchorPane{
 		});
 		
 		// --- Submit Button in New User Section 
-		submitUserButton.setOnAction(e->{
+		submitUserButton.setOnAction(event->{
 			// Ensure fields aren't empty
 			Boolean fNameFilled = !fNameField.getText().isBlank();
 			Boolean lNameFilled = !lNameField.getText().isBlank();
@@ -237,7 +238,22 @@ public class UserCoverPage extends AnchorPane{
 				Double initialAmount = Double.parseDouble(initialValueField.getText());
 				
 				disableNewUser(true);
-				createNewUser(initialAmount, firstName, lastName, confirmPassword);
+				
+				NewUser user = new NewUser(firstName, lastName, initialAmount, confirmPassword);
+				try {
+					runGUI.getDB().addUser(user);
+				} catch (SQLException e) {
+					showAlert(e.getLocalizedMessage(),"Failed to Add User");
+					e.printStackTrace();
+				}
+				
+				// Update to include new data
+				pullUserData();
+				
+				// Verify successful add and switch to tracker page
+				if (usernames.contains(user.getFullName())) 
+					runGUI.switchToTracker(user.getFullName());
+				
 			}	
 			// Display alert on failure
 			else if(newUserName == null)
@@ -258,48 +274,12 @@ public class UserCoverPage extends AnchorPane{
 		});
 	}
 	
-
-	// Creates new user, updates to SQL database 
-	private void createNewUser(Double initialAmount, String fName, String lName, String password) {
-		NewUser user = new NewUser(fName, lName, initialAmount, password);
-		LocalDate today = LocalDate.now();
-		
-		// SQL statement for inserting user name
-		String sqlName = "INSERT INTO Users (Username, Password_Hash)\r\n"
-				+ String.format("VALUES ('%s', '%s');", 
-						user.getFullName(),
-						user.getHashedPassword());	
-		
-		// SQL statement for adding initial transaction
-		String sqlTransaction = "INSERT INTO Transactions (Amount, Category, Note, Income, Date, Owner)\r\n"
-				+ String.format("VALUES (%.2f, 'Miscellaneous','Initial Transaction',1, '%s','%s');", 
-						user.getInitialAmount(), today, user.getFullName());	
-				
-				
-		// Push new user data to database
-		try {
-			// Connect to database
-			Connection conn = runGUI.getDB().getConnection();
-	        Statement stmt = conn.createStatement();
-	        
-	        // Execute statements
-	        stmt.execute(sqlName);
-	        stmt.execute(sqlTransaction);
-	        
-		} catch (Exception e) {
-	    	System.out.println("Failed to add new user to database");
-	        e.printStackTrace();
-	    }
-		
-		// Update with new data
-		pullUserData();
-		
-		// Switch to tracker page
-		if (usernames.contains(user.getFullName())) 
-			runGUI.switchToTracker(user.getFullName());
-	}
-	
-	// Show alerts when needed
+	/**
+	 * Displays alerts given some message and title
+	 * 
+	 * @param message Message for alert
+	 * @param title Title for alert
+	 */
 	private void showAlert(String message, String title) {
 		Alert alert = new Alert(AlertType.NONE, message, ButtonType.OK);
 		alert.setTitle(title);
@@ -307,25 +287,17 @@ public class UserCoverPage extends AnchorPane{
 		alert.showAndWait();		
 	}
 	
-	// Load users from database
+	/**
+	 * Loads users from database
+	 */
 	private void pullUserData() {
 		// Start fresh
 		usernames.clear();
 		hashedPasswords.clear();
-		
-		// SQL statement for selecting user names 
-		String sql = "SELECT Username, Password_Hash \r\n"
-				+ "FROM Users\r\n"
-				+ "ORDER by Username ASC;";	
-				
+	
 		// Pull user data from database
 		try {
-			// Connect to database
-			Connection conn = runGUI.getDB().getConnection();
-	        Statement stmt = conn.createStatement();
-	        
-	        // Execute query
-	        ResultSet rs = stmt.executeQuery(sql);
+	        ResultSet rs = runGUI.getDB().getUsers();
 	        
 	        // Place query data into usable lists
 			String username, password;
@@ -344,7 +316,14 @@ public class UserCoverPage extends AnchorPane{
 	}
 	
 	
-	// Make sections appear and disappear	
+	/**
+	 * Make sections appear and disappear
+	 * 	
+	 * @param disable 
+	 * @param button Button being managed
+	 * @param nodeList List of nodes to manage
+	 * @param height Height stage resizes to
+	 */
 	private void disableNodes(boolean disable, ToggleButton button, ArrayList<Node> nodeList, double height) {
 		boolean enable = !disable;
 
@@ -368,21 +347,35 @@ public class UserCoverPage extends AnchorPane{
 	}
 	
 	
-	// Change window size to fit appearing/disappearing nodes
+	/**
+	 * Change window size to fit appearing/disappearing nodes
+	 * 
+	 * @param height Height stage resizes to
+	 */
 	private void resizeWindow(double height) {
 		runGUI.primaryStage.setMaxHeight(height);
 		runGUI.primaryStage.setMinHeight(height);
 	}
 
 
-	private void setRunGUI(RunGUI runGUI) {
-		this.runGUI = runGUI;
-	}
-
+	
+	/**
+	 * Verify password matches password on file
+	 * 
+	 * @param password Given password
+	 * @param hashedPassword Hashed password from database
+	 * @return True if the password is correct
+	 */
 	private boolean verifyPassword(String password, String hashedPassword) {
 		return BCrypt.checkpw(password, hashedPassword);
 	}
 	
+	/**
+	 * Creates dialog to request and capture password
+	 * 
+	 * @param userHashedPassword Hashed password from database
+	 * @param user Name of user logging in
+	 */
 	private void passwordDialog(String userHashedPassword, String user) {
 		Dialog<Boolean> dialog = new Dialog<>();
 		dialog.setTitle("Enter Password");
@@ -420,7 +413,13 @@ public class UserCoverPage extends AnchorPane{
 		}
 	}
 	
-	// Check password meets minimum requirements
+	/**
+	 * Checks password meets minimum requirements, 
+	 * contains [a-z],[A-Z],[0-9] and at least 8 characters long
+	 * 
+	 * @param password Password being checked
+	 * @return True if password meets requirements
+	 */
 	private boolean passwordRequirements(String password) {
 		String requirements = "^(?=.*[a-z])(?=."
                 + "*[A-Z])(?=.*\\d).+$";
@@ -433,4 +432,7 @@ public class UserCoverPage extends AnchorPane{
 		return m.matches() && longEnough;
 	}
 
+	private void setRunGUI(RunGUI runGUI) {
+		this.runGUI = runGUI;
+	}
 }
